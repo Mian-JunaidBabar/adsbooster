@@ -128,6 +128,7 @@ const faqs = [
 
 type LeadFormState = {
   name: string;
+  email: string;
   businessType: string;
   city: string;
   phone: string;
@@ -136,6 +137,7 @@ type LeadFormState = {
 
 const initialForm: LeadFormState = {
   name: "",
+  email: "",
   businessType: "",
   city: "",
   phone: "",
@@ -340,6 +342,17 @@ export default function Home() {
                       placeholder="Ali Khan"
                     />
                     {errors.name ? <small>{errors.name}</small> : null}
+                  </label>
+
+                  <label className="field-block">
+                    <span>Email address</span>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={handleFieldChange("email")}
+                      placeholder="ali@example.com"
+                    />
+                    {errors.email ? <small>{errors.email}</small> : null}
                   </label>
 
                   <label className="field-block">

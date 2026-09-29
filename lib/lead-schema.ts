@@ -16,6 +16,12 @@ export const budgetOptions = [
 
 export const leadSchema = z.object({
   name: z.string().trim().min(2, "Name is required").max(80),
+  email: z
+    .string()
+    .trim()
+    .email("Enter a valid email address")
+    .max(160)
+    .transform((value) => value.toLowerCase()),
   businessType: z.enum(businessTypes),
   city: z.string().trim().min(2, "City is required").max(60),
   phone: z
