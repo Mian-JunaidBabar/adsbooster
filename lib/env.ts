@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-const optionalUrl = z.preprocess(
-  (value) => (value === "" ? undefined : value),
-  z.string().url().optional(),
-);
-
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -12,17 +7,17 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   WHATSAPP_NUMBER: z.string().default("923000000000"),
-  SUPABASE_URL: optionalUrl,
+  SUPABASE_URL: z.string().optional(),
   SUPABASE_ANON_KEY: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
-  GOOGLE_SHEETS_WEBHOOK_URL: z.string().url().optional(),
+  GOOGLE_SHEETS_WEBHOOK_URL: z.string().optional(),
   GOOGLE_SHEETS_WEBHOOK_SECRET: z.string().min(16).optional(),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z
     .string()
-    .email()
+    .min(1)
     .default("AdsBoosters.pk <onboarding@resend.dev>"),
   LEAD_NOTIFICATION_EMAIL: z
     .string()

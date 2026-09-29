@@ -1,128 +1,173 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Check, MessageSquareText, Play } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  Megaphone,
+  MessageSquareText,
+  Play,
+  Search,
+} from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
-const chipLabels = ["Clinics", "Visa consultants", "Other businesses"];
+const audienceContent = {
+  clinic: {
+    label: "Clinics",
+    type: "Clinic",
+    headline: "Fill your clinic’s appointment book.",
+    sub: "Meta and Google campaigns that bring booking enquiries straight to your front desk on WhatsApp, tracked back to the ad that sent them.",
+    proof: "Campaigns for dental, skin and physiotherapy clinics",
+    prefill:
+      "Assalam o Alaikum, meri clinic hai aur mujhe ads se zyada bookings chahiye.",
+  },
+  visa: {
+    label: "Visa Consultants",
+    type: "Visa consultancy",
+    headline: "Serious leads for your visa consultancy.",
+    sub: "Ads that reach people already planning to study or work abroad, filtered so your counsellors spend time on real applicants.",
+    proof: "Lead campaigns for study-abroad and work-visa consultants",
+    prefill:
+      "Assalam o Alaikum, main visa consultant hoon aur mujhe qualified leads chahiye.",
+  },
+  other: {
+    label: "Other Businesses",
+    type: "Local business",
+    headline: "Leads and sales from ads that pay back.",
+    sub: "Google, Meta and TikTok campaigns for local businesses, managed weekly and reported in plain numbers: enquiries, cost per lead, sales.",
+    proof: "Retail, real estate, education, restaurants and more",
+    prefill:
+      "Assalam o Alaikum, mujhe apne business ke liye ads se leads chahiye.",
+  },
+} as const;
 
 const services = [
   {
-    title: "Performance marketing",
+    title: "Google Ads",
     description:
-      "Google, Meta and TikTok campaigns built for leads and booked calls.",
+      "Search and Maps ads for people already looking for what you offer, in your city.",
+    icon: Search,
+  },
+  {
+    title: "Meta Ads",
+    description:
+      "Facebook and Instagram campaigns with lead forms and click-to-WhatsApp ads.",
+    icon: Megaphone,
+  },
+  {
+    title: "TikTok Ads",
+    description:
+      "Short video ads that reach younger buyers at a lower cost per enquiry.",
     icon: Play,
   },
   {
-    title: "Creative & copy",
+    title: "Social media management",
     description:
-      "Offer testing, hooks and landing page messaging designed around conversion.",
-    icon: MessageSquareText,
-  },
-  {
-    title: "Landing pages",
-    description:
-      "Fast, mobile-first pages that turn traffic into enquiries and WhatsApp chats.",
-    icon: ArrowRight,
-  },
-  {
-    title: "Reporting",
-    description:
-      "Clear weekly reporting with spend, cost per lead, and the next optimisation move.",
-    icon: Check,
+      "Monthly content calendar, posting and inbox replies so your pages stay active.",
+    icon: CalendarDays,
   },
 ];
 
 const process = [
   {
     step: "01",
-    title: "Audit",
-    body: "We review your offer, funnel and current ads to find the bottlenecks.",
+    title: "Free audit",
+    body: "We review your current ads or market and tell you what we would change.",
   },
   {
     step: "02",
-    title: "Build",
-    body: "We set up the campaign structure, creative and tracking for faster conversion.",
+    title: "Plan and creatives",
+    body: "Targeting, budget split and ad creatives, agreed with you before launch.",
   },
   {
     step: "03",
-    title: "Scale",
-    body: "We test offers, audiences and angles to push profitable growth with confidence.",
+    title: "Launch",
+    body: "Campaigns go live with tracking on every form, call and WhatsApp chat.",
   },
   {
     step: "04",
-    title: "Report",
-    body: "You get clear numbers and the next move to keep the pipeline performing.",
+    title: "Optimise and report",
+    body: "Weekly changes and a plain report: leads, cost per lead, what is next.",
   },
 ];
 
 const stats = [
-  { value: "6x", label: "Average ROAS" },
-  { value: "3.4x", label: "Lead lift" },
-  { value: "10k+", label: "Leads tracked" },
-  { value: "PKR 9.8M", label: "Managed spend" },
+  { value: "[00]", label: "Active clients" },
+  { value: "[00k]", label: "Leads delivered" },
+  { value: "[PKR 000]", label: "Avg. cost per lead" },
+  { value: "[00]", label: "Cities served" },
 ];
 
 const testimonials = [
   {
     quote:
-      "Their team kept the process simple. We got cleaner leads, a stronger offer and a better pipeline in under a month.",
-    name: "Dr. Ayesha Noor",
-    role: "Clinic owner",
-    business: "Aster Care",
-    city: "Lahore",
+      "[Real client quote about results, e.g. leads per month or cost per lead before and after.]",
+    name: "[Client name]",
+    role: "[Role]",
+    business: "[Business]",
+    city: "[City]",
   },
   {
     quote:
-      "We were getting traffic but not the right enquiries. AdsBoosters rebuilt the funnel and the quality improved immediately.",
-    name: "Hamza Iqbal",
-    role: "Director",
-    business: "Northview Visa",
-    city: "Islamabad",
+      "[Second real client quote. Use their words, lightly edited for length.]",
+    name: "[Client name]",
+    role: "[Role]",
+    business: "[Business]",
+    city: "[City]",
   },
 ];
 
 const pricing = [
   {
-    name: "Starter",
-    price: "PKR 25,000",
-    description:
-      "Best for new businesses and small clinics testing paid ads with a focused funnel.",
-    features: ["Campaign setup", "Landing page review", "Weekly reporting"],
+    name: "Ads management",
+    price: "PKR ___ / month",
+    description: "+ ad spend, paid directly to the platform",
+    features: [
+      "Google, Meta or TikTok campaigns",
+      "Ad creatives and copy",
+      "Lead tracking to WhatsApp",
+      "Weekly report and call",
+    ],
   },
   {
-    name: "Growth",
-    price: "PKR 60,000",
-    description:
-      "Built for brands ready to scale beyond one campaign and improve lead quality at the same time.",
+    name: "Social media management",
+    price: "PKR ___ / month",
+    description: "Ad spend not included",
     features: [
-      "Everything in Starter",
-      "Creative testing",
-      "Conversion optimization",
+      "Monthly content calendar",
+      "Posts and stories designed",
+      "Inbox and comment replies",
+      "Monthly performance summary",
     ],
   },
 ];
 
 const faqs = [
   {
-    question: "How fast can we launch?",
+    question: "Is ad spend included in your fee?",
     answer:
-      "Most campaigns launch within 7 to 14 days after we receive the offer, ad account access, and goals.",
+      "No. Ad spend is always separate and paid directly to Google, Meta or TikTok. Our fee covers planning, creatives and management.",
   },
   {
-    question: "Do you work with clinics and visa consultants?",
+    question: "How soon will I get leads?",
     answer:
-      "Yes. We work with health clinics, visa consultants, education businesses and local service companies that need better leads.",
+      "Most campaigns start bringing enquiries in the first week after launch. We tune targeting in the first month to lower your cost per lead.",
   },
   {
-    question: "Do you handle creatives and landing pages?",
+    question: "Do I need a minimum ad budget?",
     answer:
-      "Yes. We create ad creative, campaign copy and landing page messaging that supports the offer and conversion goals.",
+      "We recommend starting from 50k PKR a month in ad spend so there is enough data to optimise. We will tell you honestly if your budget is too small.",
   },
   {
-    question: "What do you charge?",
+    question: "Kya aap sirf Lahore/Karachi mein kaam karte hain?",
     answer:
-      "Pricing depends on the campaign scope, ad spend and reporting requirements. We keep it transparent and tied to performance.",
+      "Nahi. Hum poore Pakistan mein businesses ke liye ads chalate hain, aur calls aur WhatsApp par kaam karte hain.",
+  },
+  {
+    question: "Is there a long contract?",
+    answer:
+      "No. We work month to month. You own your ad accounts, pages and data.",
   },
 ];
 
@@ -138,13 +183,15 @@ type LeadFormState = {
 const initialForm: LeadFormState = {
   name: "",
   email: "",
-  businessType: "",
+  businessType: "Clinic",
   city: "",
   phone: "",
   budget: "",
 };
 
 export default function Home() {
+  const [audience, setAudience] =
+    useState<keyof typeof audienceContent>("clinic");
   const [form, setForm] = useState<LeadFormState>(initialForm);
   const [errors, setErrors] = useState<
     Partial<Record<keyof LeadFormState, string>>
@@ -152,6 +199,16 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
+  const audienceDetails = audienceContent[audience];
+  const whatsappHref = `https://wa.me/923000000000?text=${encodeURIComponent(audienceDetails.prefill)}`;
+
+  const selectAudience = (nextAudience: keyof typeof audienceContent) => {
+    setAudience(nextAudience);
+    setForm((current) => ({
+      ...current,
+      businessType: audienceContent[nextAudience].type,
+    }));
+  };
 
   const handleFieldChange =
     (field: keyof LeadFormState) =>
@@ -231,10 +288,7 @@ export default function Home() {
             <a href="#faq">FAQ</a>
           </nav>
 
-          <a
-            className="whatsapp-button header-whatsapp"
-            href="https://wa.me/923000000000?text=Hi%20AdsBoosters%2C%20I%20want%20a%20free%20ad%20audit"
-          >
+          <a className="whatsapp-button header-whatsapp" href={whatsappHref}>
             <MessageSquareText size={18} />
             WhatsApp
           </a>
@@ -262,31 +316,30 @@ export default function Home() {
               role="tablist"
               aria-label="Business audience selector"
             >
-              {chipLabels.map((label, index) => (
-                <button
-                  key={label}
-                  type="button"
-                  className={index === 0 ? "chip active" : "chip"}
-                  role="tab"
-                  aria-selected={index === 0}
+              {(
+                Object.keys(audienceContent) as Array<
+                  keyof typeof audienceContent
                 >
-                  {label}
+              ).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={key === audience ? "chip active" : "chip"}
+                  role="tab"
+                  aria-selected={key === audience}
+                  onClick={() => selectAudience(key)}
+                >
+                  {audienceContent[key].label}
                 </button>
               ))}
             </div>
 
-            <h1>More leads from the ads you already run.</h1>
+            <h1>{audienceDetails.headline}</h1>
 
-            <p className="hero-subline">
-              We help clinics, visa consultants and local businesses turn ad
-              spend into qualified enquiries and booked calls.
-            </p>
+            <p className="hero-subline">{audienceDetails.sub}</p>
 
             <div className="cta-stack">
-              <a
-                className="whatsapp-button full-width"
-                href="https://wa.me/923000000000?text=Hi%20AdsBoosters%2C%20I%20want%20a%20free%20ad%20audit"
-              >
+              <a className="whatsapp-button full-width" href={whatsappHref}>
                 <MessageSquareText size={18} />
                 Chat on WhatsApp
               </a>
@@ -297,13 +350,11 @@ export default function Home() {
 
             <div className="proof-row">
               <Check size={18} />
-              <span>
-                Trusted by businesses that want real growth, not vanity metrics.
-              </span>
+              <span>{audienceDetails.proof}</span>
             </div>
           </div>
 
-          <aside className="audit-card">
+          <aside id="audit" className="audit-card">
             <div className="audit-card-inner">
               {isSent ? (
                 <>
@@ -313,10 +364,7 @@ export default function Home() {
                     <Check size={18} />
                     <span>Enquiry received</span>
                   </div>
-                  <a
-                    className="whatsapp-button full-width"
-                    href="https://wa.me/923000000000?text=Hi%20AdsBoosters%2C%20I%20want%20a%20free%20ad%20audit"
-                  >
+                  <a className="whatsapp-button full-width" href={whatsappHref}>
                     <MessageSquareText size={18} />
                     Chat on WhatsApp
                   </a>
@@ -436,6 +484,10 @@ export default function Home() {
           <div className="section-heading-block">
             <div className="eyebrow">What we run</div>
             <h2>Ads that bring enquiries, not just clicks.</h2>
+            <p className="section-lead">
+              We plan, launch and manage your campaigns end to end, then report
+              in plain language every week.
+            </p>
           </div>
 
           <div className="card-grid four-up">
@@ -455,8 +507,8 @@ export default function Home() {
       <section id="process" className="page-section paper-section">
         <div className="container">
           <div className="section-heading-block">
-            <div className="eyebrow">How we work</div>
-            <h2>A clear process that keeps the funnel moving.</h2>
+            <div className="eyebrow">How it works</div>
+            <h2>From first message to live ads in about a week</h2>
           </div>
 
           <div className="card-grid four-up">
@@ -482,16 +534,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="page-section surface-section">
+      <section className="page-section paper-section">
         <div className="container">
           <div className="section-heading-block narrow">
-            <div className="eyebrow">Testimonials</div>
-            <h2>What clients say when the pipeline starts working.</h2>
+            <div className="eyebrow">Clients</div>
+            <h2>What our clients say</h2>
           </div>
 
           <div className="testimonial-grid">
             {testimonials.map(({ quote, name, role, business, city }) => (
-              <blockquote key={name} className="testimonial-box">
+              <blockquote key={quote} className="testimonial-box">
                 <p>“{quote}”</p>
                 <footer>
                   <strong>{name}</strong>
@@ -506,11 +558,15 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="pricing" className="page-section paper-section">
+      <section id="pricing" className="page-section surface-section">
         <div className="container">
           <div className="section-heading-block narrow">
             <div className="eyebrow">Pricing</div>
-            <h2>Simple monthly plans for businesses ready to grow.</h2>
+            <h2>One monthly fee. Ad spend stays yours.</h2>
+            <p className="section-lead">
+              You pay the platforms directly for ad spend, so you always see
+              exactly where your money goes.
+            </p>
           </div>
 
           <div className="pricing-grid">
@@ -524,20 +580,20 @@ export default function Home() {
                     <li key={feature}>{feature}</li>
                   ))}
                 </ul>
-                <button type="button" className="secondary-button">
+                <a href="#audit" className="secondary-button">
                   Get a free ad audit
-                </button>
+                </a>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="faq" className="page-section surface-section">
+      <section id="faq" className="page-section paper-section">
         <div className="container faq-wrap">
           <div className="section-heading-block narrow">
             <div className="eyebrow">FAQ</div>
-            <h2>Questions clients ask before starting.</h2>
+            <h2>Questions we hear most</h2>
           </div>
 
           <div className="faq-list">
@@ -554,20 +610,27 @@ export default function Home() {
       <section className="page-section final-cta-wrap">
         <div className="container">
           <div className="final-cta">
-            <div>
-              <div className="small-label light">
-                Want better campaign results?
-              </div>
-              <h2>Book a free ad audit.</h2>
+            <div className="final-cta-copy">
+              <h2>
+                Tell us what you sell. We will show you where the leads are.
+              </h2>
+              <p>
+                Free audit of your current ads, or a first-campaign plan if you
+                are starting out.
+              </p>
             </div>
-
-            <a
-              className="whatsapp-button"
-              href="https://wa.me/923000000000?text=Hi%20AdsBoosters%2C%20I%20want%20a%20free%20ad%20audit"
-            >
-              <MessageSquareText size={18} />
-              Chat on WhatsApp
-            </a>
+            <div className="final-cta-actions">
+              <a className="whatsapp-button full-width" href={whatsappHref}>
+                <MessageSquareText size={18} />
+                Chat on WhatsApp
+              </a>
+              <a className="secondary-button full-width" href="#audit">
+                Get a free ad audit
+              </a>
+              <a className="tertiary-link" href="#audit">
+                Book a 15-min call
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -585,13 +648,24 @@ export default function Home() {
 
           <div className="footer-links">
             <a href="#services">Services</a>
+            <a href="#process">Process</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
 
-          <div className="copyright">© 2026 AdsBoosters.pk</div>
+          <div className="copyright-row">
+            <div className="copyright">© 2026 AdsBoosters.pk</div>
+            <div className="footer-platforms">Google · Meta · TikTok</div>
+          </div>
         </div>
       </footer>
+
+      <div className="mobile-sticky-cta">
+        <a className="whatsapp-button full-width" href={whatsappHref}>
+          <MessageSquareText size={18} />
+          Chat on WhatsApp
+        </a>
+      </div>
     </main>
   );
 }

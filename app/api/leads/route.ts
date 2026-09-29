@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const parsed = leadSchema.parse(payload);
 
     if (
-      !env.GOOGLE_SHEETS_WEBHOOK_URL ||
+      !isHttpUrl(env.GOOGLE_SHEETS_WEBHOOK_URL) ||
       !env.GOOGLE_SHEETS_WEBHOOK_SECRET ||
       !env.RESEND_API_KEY
     ) {
@@ -121,6 +121,17 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 },
     );
+  }
+}
+
+function isHttpUrl(value: string | undefined): value is string {
+  if (!value) return false;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:";
+  } catch {
+    return false;
   }
 }
 
