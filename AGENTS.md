@@ -43,3 +43,13 @@ Fill these in during Phase 0 once the project exists: install, dev, build, lint,
 ## Definition of done for any change
 
 Typecheck, lint, unit tests and the e2e tests for the touched flow pass. Mobile (390px) and desktop (1440px) checked. No new console errors. Lighthouse mobile performance stays at 90 or above on the landing page.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
