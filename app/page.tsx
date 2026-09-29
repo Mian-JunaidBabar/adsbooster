@@ -1,14 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
   Check,
+  Compass,
+  ExternalLink,
+  Mail,
+  MapPin,
   Megaphone,
   MessageSquareText,
   Play,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
@@ -274,12 +280,19 @@ export default function Home() {
     <main className="adsbooster-page">
       <header className="site-header">
         <div className="container header-inner">
-          <div className="brand-lockup" aria-label="AdsBoosters.pk logo">
-            <span className="brand-word">Ads</span>
-            <span className="brand-swoosh" aria-hidden="true" />
-            <span className="brand-word">Boosters</span>
-            <span className="brand-domain">.pk</span>
-          </div>
+          <Link
+            className="navbar-logo"
+            href="/"
+            aria-label="AdsBoosters.pk home"
+          >
+            <Image
+              src="/logo-white.webp"
+              alt="AdsBoosters.pk"
+              width={210}
+              height={45}
+              priority
+            />
+          </Link>
 
           <nav className="nav-links" aria-label="Main navigation">
             <a href="#services">Services</a>
@@ -298,7 +311,7 @@ export default function Home() {
       <section className="hero-section">
         <div className="hero-map" aria-hidden="true">
           <Image
-            src="/hero-map.png"
+            src="/hero-map.webp"
             alt=""
             fill
             priority
@@ -637,25 +650,71 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <div className="footer-brand" aria-label="AdsBoosters.pk footer logo">
-            <Image
-              src="/logo-white.png"
-              alt="AdsBoosters.pk"
-              width={160}
-              height={32}
-            />
+          <div className="footer-main">
+            <div
+              className="footer-brand"
+              aria-label="AdsBoosters.pk footer logo"
+            >
+              <Image
+                src="/logo.webp"
+                alt="AdsBoosters.pk"
+                width={88}
+                height={88}
+                className="footer-logo-image"
+              />
+              <div>
+                <strong>AdsBoosters.pk</strong>
+                <p>Performance ads for businesses ready to grow.</p>
+              </div>
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <Compass size={15} /> Explore
+              </h3>
+              <a href="#services">Services</a>
+              <a href="#process">Process</a>
+              <a href="#pricing">Pricing</a>
+              <a href="#faq">FAQ</a>
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <Mail size={15} /> Contact
+              </h3>
+              <a href="mailto:adsboosters6030@gmail.com">
+                <Mail size={15} /> Email us
+              </a>
+              <a href={whatsappHref}>Chat on WhatsApp</a>
+              <span>
+                <MapPin size={15} /> Pakistan · Serving nationwide
+              </span>
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <ShieldCheck size={15} /> Legal
+              </h3>
+              <a href="/privacy">
+                <ShieldCheck size={15} /> Privacy policy
+              </a>
+              <a href="/terms">Terms of service</a>
+            </div>
           </div>
 
-          <div className="footer-links">
-            <a href="#services">Services</a>
-            <a href="#process">Process</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#faq">FAQ</a>
-          </div>
-
-          <div className="copyright-row">
+          <div className="footer-meta">
             <div className="copyright">© 2026 AdsBoosters.pk</div>
             <div className="footer-platforms">Google · Meta · TikTok</div>
+            <div className="footer-credit">
+              Designed and developed by{" "}
+              <a
+                href="https://deepdevsolutions.com"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Deep Dev Solutions <ExternalLink size={13} />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
