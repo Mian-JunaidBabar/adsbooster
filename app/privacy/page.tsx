@@ -48,6 +48,16 @@ export default function PrivacyPage() {
         </section>
 
         <section className="legal-section">
+          <h2>Analytics</h2>
+          <p>
+            We use Google Analytics to understand how visitors use this website
+            and improve our campaigns and content. Google may process usage data
+            through cookies or similar technologies. You can manage cookies in
+            your browser settings or use Google&apos;s available opt-out tools.
+          </p>
+        </section>
+
+        <section className="legal-section">
           <h2>Retention and security</h2>
           <p>
             We keep enquiry information only for as long as it is useful for

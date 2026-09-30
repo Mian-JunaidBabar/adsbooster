@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -15,6 +16,7 @@ const barlow = Barlow_Condensed({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://adsboosters.pk";
+const isProduction = process.env.NODE_ENV === "production";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -24,6 +26,10 @@ const organizationSchema = {
   description:
     "Performance advertising agency for clinics, visa consultants and local businesses in Pakistan.",
   areaServed: { "@type": "Country", name: "Pakistan" },
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=61593563594054",
+    "https://www.instagram.com/adsboosters.pk",
+  ],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer service",
@@ -91,6 +97,21 @@ export default function RootLayout({
           }}
         />
       </head>
+      {isProduction ? (
+        <>
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-VKXFX75ZRM"
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-VKXFX75ZRM');
+gtag('config', 'G-GTMDWH0T54');`}
+          </Script>
+        </>
+      ) : null}
       <body>{children}</body>
     </html>
   );

@@ -884,6 +884,26 @@ export default function Home() {
               </a>
               <a href="/terms">Terms of service</a>
             </div>
+
+            <div className="footer-column">
+              <h3>
+                <ExternalLink size={15} /> Follow
+              </h3>
+              <a
+                href="https://www.facebook.com/profile.php?id=61593563594054"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink size={15} /> Facebook
+              </a>
+              <a
+                href="https://www.instagram.com/adsboosters.pk"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink size={15} /> Instagram
+              </a>
+            </div>
           </div>
 
           <div className="footer-meta">
