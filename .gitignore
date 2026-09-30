@@ -44,3 +44,5 @@ next-env.d.ts
 /others
 /tests
 /docs
+
+/.vscode
