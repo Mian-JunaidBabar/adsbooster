@@ -40,6 +40,17 @@ export const leadSchema = z.object({
     })
     .pipe(z.string().regex(/^\+923\d{9}$/)),
   budget: z.enum(budgetOptions),
+  audience: z.enum(["clinic", "visa", "other"]).optional(),
+  utmSource: z.string().trim().max(255).optional(),
+  utmMedium: z.string().trim().max(255).optional(),
+  utmCampaign: z.string().trim().max(255).optional(),
+  utmContent: z.string().trim().max(255).optional(),
+  utmTerm: z.string().trim().max(255).optional(),
+  clickId: z.string().trim().max(255).optional(),
+  landingUrl: z.string().trim().max(2000).optional(),
+  referrer: z.string().trim().max(2000).optional(),
+  company: z.string().optional(),
+  startedAt: z.string().optional(),
 });
 
 export type LeadInput = z.infer<typeof leadSchema>;

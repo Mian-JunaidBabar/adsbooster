@@ -46,3 +46,9 @@ next-env.d.ts
 /docs
 
 /.vscode
+Claude outputs
+
+playwright.config.ts
+
+playwright-report
+test-results
