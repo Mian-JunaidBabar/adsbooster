@@ -182,7 +182,9 @@ export async function POST(request: NextRequest) {
       const anyFailed = results.some(
         (r) =>
           r.status === "rejected" ||
-          (r.status === "fulfilled" && (r.value as any)?.error),
+          (r.status === "fulfilled" &&
+            "error" in r.value &&
+            Boolean(r.value.error)),
       );
 
       if (anyFailed) {

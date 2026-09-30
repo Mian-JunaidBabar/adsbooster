@@ -22,7 +22,9 @@ const rawWhatsApp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
 const WHATSAPP_NUMBER = rawWhatsApp.replace(/\D/g, "");
 
 if (process.env.NODE_ENV === "production" && !WHATSAPP_NUMBER) {
-  console.warn("WARNING: NEXT_PUBLIC_WHATSAPP_NUMBER is missing. WhatsApp buttons will be hidden.");
+  console.warn(
+    "WARNING: NEXT_PUBLIC_WHATSAPP_NUMBER is missing. WhatsApp buttons will be hidden.",
+  );
 }
 
 const audienceContent = {
@@ -261,24 +263,35 @@ export default function Home() {
         sessionStorage.setItem("adsbooster_attr", JSON.stringify(sessionData));
       }
 
-      setAttribution(sessionData);
+      queueMicrotask(() => setAttribution(sessionData));
 
       const forParam = urlParams.get("for");
-      if (forParam === "clinics" || forParam === "clinic") {
-        setAudience("clinic");
-        setForm((prev) => ({ ...prev, businessType: audienceContent.clinic.type }));
-      } else if (forParam === "visa") {
-        setAudience("visa");
-        setForm((prev) => ({ ...prev, businessType: audienceContent.visa.type }));
-      } else {
-        setAudience("other");
-        setForm((prev) => ({ ...prev, businessType: audienceContent.other.type }));
-      }
+      queueMicrotask(() => {
+        if (forParam === "clinics" || forParam === "clinic") {
+          setAudience("clinic");
+          setForm((prev) => ({
+            ...prev,
+            businessType: audienceContent.clinic.type,
+          }));
+        } else if (forParam === "visa") {
+          setAudience("visa");
+          setForm((prev) => ({
+            ...prev,
+            businessType: audienceContent.visa.type,
+          }));
+        } else {
+          setAudience("other");
+          setForm((prev) => ({
+            ...prev,
+            businessType: audienceContent.other.type,
+          }));
+        }
+      });
     } catch {
       // Ignore storage errors
     }
 
-    setStartedAt(new Date().toISOString());
+    queueMicrotask(() => setStartedAt(new Date().toISOString()));
   }, []);
 
   const selectAudience = (nextAudience: keyof typeof audienceContent) => {
@@ -525,7 +538,7 @@ export default function Home() {
                     onChange={handleFieldChange("company")}
                     tabIndex={-1}
                     autoComplete="off"
-                    aria-hidden="true"
+                    aria-label="Company (leave blank)"
                     style={{
                       position: "absolute",
                       width: "1px",
@@ -906,4 +919,3 @@ export default function Home() {
     </main>
   );
 }
-

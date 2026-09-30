@@ -1,5 +1,29 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Deployment
+
+Set these Vercel Production environment variables before deploying:
+
+- `NEXT_PUBLIC_APP_URL=https://adsboosters.pk`
+- `NEXT_PUBLIC_SITE_URL=https://adsboosters.pk`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` with the digits-only WhatsApp number
+- `GOOGLE_SHEETS_WEBHOOK_URL`
+- `GOOGLE_SHEETS_WEBHOOK_SECRET` with at least 16 characters
+- `LEAD_NOTIFICATION_EMAIL`
+- `RESEND_API_KEY` and `RESEND_FROM_EMAIL` when email notifications are enabled
+
+The public WhatsApp variable is separate from the server-only `WHATSAPP_NUMBER` because it is embedded in the client bundle. The production build validates `LEAD_NOTIFICATION_EMAIL`, so omitting it from Vercel causes `npm run build` to fail even when the same build succeeds locally with `.env.local`.
+
+Run the deployment checks locally with:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run e2e
+```
+
 ## Getting Started
 
 First, run the development server:
