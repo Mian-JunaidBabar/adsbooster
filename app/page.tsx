@@ -16,9 +16,25 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+
+const rawWhatsApp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+const WHATSAPP_NUMBER = rawWhatsApp.replace(/\D/g, "");
+
+if (process.env.NODE_ENV === "production" && !WHATSAPP_NUMBER) {
+  console.warn("WARNING: NEXT_PUBLIC_WHATSAPP_NUMBER is missing. WhatsApp buttons will be hidden.");
+}
 
 const audienceContent = {
+  other: {
+    label: "Other Businesses",
+    type: "Local business",
+    headline: "Leads and sales from ads that pay back.",
+    sub: "Google, Meta and TikTok campaigns for local businesses, managed weekly and reported in plain numbers: enquiries, cost per lead, sales.",
+    proof: "Retail, real estate, education, restaurants and more",
+    prefill:
+      "Assalam o Alaikum, mujhe apne business ke liye ads se leads chahiye.",
+  },
   clinic: {
     label: "Clinics",
     type: "Clinic",
@@ -36,15 +52,6 @@ const audienceContent = {
     proof: "Lead campaigns for study-abroad and work-visa consultants",
     prefill:
       "Assalam o Alaikum, main visa consultant hoon aur mujhe qualified leads chahiye.",
-  },
-  other: {
-    label: "Other Businesses",
-    type: "Local business",
-    headline: "Leads and sales from ads that pay back.",
-    sub: "Google, Meta and TikTok campaigns for local businesses, managed weekly and reported in plain numbers: enquiries, cost per lead, sales.",
-    proof: "Retail, real estate, education, restaurants and more",
-    prefill:
-      "Assalam o Alaikum, mujhe apne business ke liye ads se leads chahiye.",
   },
 } as const;
 
@@ -75,7 +82,7 @@ const services = [
   },
 ];
 
-const process = [
+const processSteps = [
   {
     step: "01",
     title: "Free audit",
@@ -184,20 +191,22 @@ type LeadFormState = {
   city: string;
   phone: string;
   budget: string;
+  company: string;
 };
 
 const initialForm: LeadFormState = {
   name: "",
   email: "",
-  businessType: "Clinic",
+  businessType: "Local business",
   city: "",
   phone: "",
   budget: "",
+  company: "",
 };
 
 export default function Home() {
   const [audience, setAudience] =
-    useState<keyof typeof audienceContent>("clinic");
+    useState<keyof typeof audienceContent>("other");
   const [form, setForm] = useState<LeadFormState>(initialForm);
   const [errors, setErrors] = useState<
     Partial<Record<keyof LeadFormState, string>>
@@ -205,8 +214,72 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
+  const [startedAt, setStartedAt] = useState("");
+  const [attribution, setAttribution] = useState<Record<string, string>>({});
+
   const audienceDetails = audienceContent[audience];
-  const whatsappHref = `https://wa.me/923000000000?text=${encodeURIComponent(audienceDetails.prefill)}`;
+  const whatsappHref = WHATSAPP_NUMBER
+    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(audienceDetails.prefill)}`
+    : "";
+
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramsToKeep = [
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_content",
+        "utm_term",
+        "gclid",
+        "fbclid",
+        "ttclid",
+      ];
+
+      const raw = sessionStorage.getItem("adsbooster_attr");
+      const sessionData = raw ? JSON.parse(raw) : {};
+
+      let updated = false;
+      for (const param of paramsToKeep) {
+        if (urlParams.has(param) && !sessionData[param]) {
+          sessionData[param] = urlParams.get(param);
+          updated = true;
+        }
+      }
+
+      if (!sessionData.landingUrl) {
+        sessionData.landingUrl = window.location.href.split("#")[0];
+        updated = true;
+      }
+
+      if (!sessionData.referrer && document.referrer) {
+        sessionData.referrer = document.referrer;
+        updated = true;
+      }
+
+      if (updated) {
+        sessionStorage.setItem("adsbooster_attr", JSON.stringify(sessionData));
+      }
+
+      setAttribution(sessionData);
+
+      const forParam = urlParams.get("for");
+      if (forParam === "clinics" || forParam === "clinic") {
+        setAudience("clinic");
+        setForm((prev) => ({ ...prev, businessType: audienceContent.clinic.type }));
+      } else if (forParam === "visa") {
+        setAudience("visa");
+        setForm((prev) => ({ ...prev, businessType: audienceContent.visa.type }));
+      } else {
+        setAudience("other");
+        setForm((prev) => ({ ...prev, businessType: audienceContent.other.type }));
+      }
+    } catch {
+      // Ignore storage errors
+    }
+
+    setStartedAt(new Date().toISOString());
+  }, []);
 
   const selectAudience = (nextAudience: keyof typeof audienceContent) => {
     setAudience(nextAudience);
@@ -230,13 +303,18 @@ export default function Home() {
     const nextErrors: Partial<Record<keyof LeadFormState, string>> = {};
 
     Object.entries(form).forEach(([key, value]) => {
-      if (!value.trim()) {
+      if (key !== "company" && !value.trim()) {
         nextErrors[key as keyof LeadFormState] = "This field is required.";
       }
     });
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
+      setTimeout(() => {
+        const firstErrorKey = Object.keys(nextErrors)[0];
+        const el = document.getElementsByName(firstErrorKey)[0];
+        if (el) (el as HTMLElement).focus();
+      }, 0);
       return;
     }
 
@@ -244,18 +322,41 @@ export default function Home() {
     setServerMessage("");
 
     try {
+      const payload = {
+        ...form,
+        audience,
+        startedAt,
+        utmSource: attribution.utm_source,
+        utmMedium: attribution.utm_medium,
+        utmCampaign: attribution.utm_campaign,
+        utmContent: attribution.utm_content,
+        utmTerm: attribution.utm_term,
+        clickId: attribution.gclid || attribution.fbclid || attribution.ttclid,
+        landingUrl: attribution.landingUrl,
+        referrer: attribution.referrer,
+      };
+
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        setServerMessage(data.error ?? "Your enquiry could not be sent.");
+        if (data.fields) {
+          setErrors(data.fields);
+          setTimeout(() => {
+            const firstErrorKey = Object.keys(data.fields)[0];
+            const el = document.getElementsByName(firstErrorKey)[0];
+            if (el) (el as HTMLElement).focus();
+          }, 0);
+        } else {
+          setServerMessage(data.error ?? "Your enquiry could not be sent.");
+        }
         return;
       }
 
@@ -274,6 +375,7 @@ export default function Home() {
     setForm(initialForm);
     setErrors({});
     setServerMessage("");
+    setStartedAt(new Date().toISOString());
   };
 
   return (
@@ -301,10 +403,17 @@ export default function Home() {
             <a href="#faq">FAQ</a>
           </nav>
 
-          <a className="whatsapp-button header-whatsapp" href={whatsappHref}>
-            <MessageSquareText size={18} />
-            WhatsApp
-          </a>
+          {WHATSAPP_NUMBER ? (
+            <a
+              className="whatsapp-button header-whatsapp"
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageSquareText size={18} />
+              WhatsApp
+            </a>
+          ) : null}
         </div>
       </header>
 
@@ -352,10 +461,17 @@ export default function Home() {
             <p className="hero-subline">{audienceDetails.sub}</p>
 
             <div className="cta-stack">
-              <a className="whatsapp-button full-width" href={whatsappHref}>
-                <MessageSquareText size={18} />
-                Chat on WhatsApp
-              </a>
+              {WHATSAPP_NUMBER ? (
+                <a
+                  className="whatsapp-button full-width"
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquareText size={18} />
+                  Chat on WhatsApp
+                </a>
+              ) : null}
               <span className="reply-line">
                 Replies within 15 minutes, 10am–8pm
               </span>
@@ -377,10 +493,17 @@ export default function Home() {
                     <Check size={18} />
                     <span>Enquiry received</span>
                   </div>
-                  <a className="whatsapp-button full-width" href={whatsappHref}>
-                    <MessageSquareText size={18} />
-                    Chat on WhatsApp
-                  </a>
+                  {WHATSAPP_NUMBER ? (
+                    <a
+                      className="whatsapp-button full-width"
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MessageSquareText size={18} />
+                      Chat on WhatsApp
+                    </a>
+                  ) : null}
                   <button
                     type="button"
                     className="secondary-button"
@@ -394,10 +517,33 @@ export default function Home() {
                   <div className="small-label">Free ad audit</div>
                   <h2>Tell us about your business.</h2>
 
+                  {/* Honeypot field */}
+                  <input
+                    type="text"
+                    name="company"
+                    value={form.company}
+                    onChange={handleFieldChange("company")}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      width: "1px",
+                      height: "1px",
+                      padding: 0,
+                      margin: "-1px",
+                      overflow: "hidden",
+                      clip: "rect(0, 0, 0, 0)",
+                      whiteSpace: "nowrap",
+                      border: 0,
+                    }}
+                  />
+
                   <label className="field-block">
                     <span>Your name</span>
                     <input
                       type="text"
+                      name="name"
                       value={form.name}
                       onChange={handleFieldChange("name")}
                       placeholder="Ali Khan"
@@ -409,6 +555,7 @@ export default function Home() {
                     <span>Email address</span>
                     <input
                       type="email"
+                      name="email"
                       value={form.email}
                       onChange={handleFieldChange("email")}
                       placeholder="ali@example.com"
@@ -419,6 +566,7 @@ export default function Home() {
                   <label className="field-block">
                     <span>Business type</span>
                     <select
+                      name="businessType"
                       value={form.businessType}
                       onChange={handleFieldChange("businessType")}
                     >
@@ -438,6 +586,7 @@ export default function Home() {
                     <span>City</span>
                     <input
                       type="text"
+                      name="city"
                       value={form.city}
                       onChange={handleFieldChange("city")}
                       placeholder="Lahore"
@@ -449,6 +598,7 @@ export default function Home() {
                     <span>WhatsApp number</span>
                     <input
                       type="tel"
+                      name="phone"
                       value={form.phone}
                       onChange={handleFieldChange("phone")}
                       placeholder="03XX XXXXXXX"
@@ -459,6 +609,7 @@ export default function Home() {
                   <label className="field-block">
                     <span>Monthly ad budget</span>
                     <select
+                      name="budget"
                       value={form.budget}
                       onChange={handleFieldChange("budget")}
                     >
@@ -525,7 +676,7 @@ export default function Home() {
           </div>
 
           <div className="card-grid four-up">
-            {process.map(({ step, title, body }) => (
+            {processSteps.map(({ step, title, body }) => (
               <article key={step} className="content-card process-card">
                 <div className="step-label">{step}</div>
                 <h3>{title}</h3>
@@ -633,14 +784,26 @@ export default function Home() {
               </p>
             </div>
             <div className="final-cta-actions">
-              <a className="whatsapp-button full-width" href={whatsappHref}>
-                <MessageSquareText size={18} />
-                Chat on WhatsApp
-              </a>
+              {WHATSAPP_NUMBER ? (
+                <a
+                  className="whatsapp-button full-width"
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquareText size={18} />
+                  Chat on WhatsApp
+                </a>
+              ) : null}
               <a className="secondary-button full-width" href="#audit">
                 Get a free ad audit
               </a>
-              <a className="tertiary-link" href="#audit">
+              <a
+                className="tertiary-link"
+                href="https://cal.com/adsboosters"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Book a 15-min call
               </a>
             </div>
@@ -685,7 +848,15 @@ export default function Home() {
               <a href="mailto:adsboosters6030@gmail.com">
                 <Mail size={15} /> Email us
               </a>
-              <a href={whatsappHref}>Chat on WhatsApp</a>
+              {WHATSAPP_NUMBER ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Chat on WhatsApp
+                </a>
+              ) : null}
               <span>
                 <MapPin size={15} /> Pakistan · Serving nationwide
               </span>
@@ -719,12 +890,20 @@ export default function Home() {
         </div>
       </footer>
 
-      <div className="mobile-sticky-cta">
-        <a className="whatsapp-button full-width" href={whatsappHref}>
-          <MessageSquareText size={18} />
-          Chat on WhatsApp
-        </a>
-      </div>
+      {WHATSAPP_NUMBER ? (
+        <div className="mobile-sticky-cta">
+          <a
+            className="whatsapp-button full-width"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MessageSquareText size={18} />
+            Chat on WhatsApp
+          </a>
+        </div>
+      ) : null}
     </main>
   );
 }
+
