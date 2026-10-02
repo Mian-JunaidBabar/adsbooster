@@ -1,242 +1,102 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
   Check,
+  Compass,
+  ExternalLink,
+  Mail,
   MapPin,
   MessageSquareText,
+  ShieldCheck,
 } from "lucide-react";
-import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from "react";
-import { content, getCompleteStats, getCompleteTestimonials } from "../lib/content";
-import CountUp from "react-countup";
+import type { CSSProperties } from "react";
+import CountUp from "../components/CountUp";
+import FaqItem from "../components/FaqItem";
+import LeadForm from "../components/LeadForm";
+import MotionController from "../components/MotionController";
+import NavPills from "../components/NavPills";
+import StickyWhatsApp from "../components/StickyWhatsApp";
+import {
+  content,
+  getCompleteStats,
+  getCompleteTestimonials,
+  isPlaceholder,
+  type ServiceItem,
+} from "../lib/content";
+import { hasWhatsApp, whatsappLink } from "../lib/whatsapp";
 
-const rawWhatsApp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
-const WHATSAPP_NUMBER = rawWhatsApp.replace(/\D/g, "");
+const whatsappHref = whatsappLink(content.hero.whatsappPrefill);
 
-if (process.env.NODE_ENV === "production" && !WHATSAPP_NUMBER) {
-  console.warn(
-    "WARNING: NEXT_PUBLIC_WHATSAPP_NUMBER is missing. WhatsApp buttons will be hidden.",
+/** Scroll-reveal marker; `index` staggers siblings by 70 ms each. */
+const reveal = (index = 0) => ({
+  "data-reveal": "",
+  "data-reveal-delay": index,
+});
+
+/** Hero entrance: each piece rises in 60 ms after the one before it. */
+const rise = (index: number) => ({ "--i": index }) as CSSProperties;
+
+type ServiceCardProps = ServiceItem & { index: number };
+
+function ServiceCard({
+  title,
+  description,
+  icon: Icon,
+  accent,
+  href,
+  index,
+}: ServiceCardProps) {
+  const inner = (
+    <>
+      <div className="icon-wrap">
+        <Icon size={20} aria-hidden="true" />
+      </div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </>
+  );
+  const className = "content-card service-card";
+
+  if (href === undefined) {
+    return (
+      <article className={className} data-accent={accent} {...reveal(index)}>
+        {inner}
+      </article>
+    );
+  }
+
+  const target = href || "#audit";
+  const external = target.startsWith("http");
+  return (
+    <a
+      className={`${className} is-link`}
+      data-accent={accent}
+      href={target}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      {...reveal(index)}
+    >
+      {inner}
+      <span className="card-cue">
+        Learn more <ArrowRight size={16} aria-hidden="true" />
+      </span>
+    </a>
   );
 }
 
-const whatsappHref = WHATSAPP_NUMBER
-  ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(content.hero.whatsappPrefill)}`
-  : "";
-
-type LeadFormState = {
-  name: string;
-  email: string;
-  businessType: string;
-  businessTypeOther: string;
-  city: string;
-  phone: string;
-  budget: string;
-  company: string;
-};
-
-const initialForm: LeadFormState = {
-  name: "",
-  email: "",
-  businessType: "",
-  businessTypeOther: "",
-  city: "",
-  phone: "",
-  budget: "",
-  company: "",
-};
+function WhatsAppIcon() {
+  return <MessageSquareText size={18} aria-hidden="true" />;
+}
 
 export default function Home() {
-  const [form, setForm] = useState<LeadFormState>(initialForm);
-  const [errors, setErrors] = useState<Partial<Record<keyof LeadFormState, string>>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSent, setIsSent] = useState(false);
-  const [serverMessage, setServerMessage] = useState("");
-  const [startedAt, setStartedAt] = useState("");
-  const [attribution, setAttribution] = useState<Record<string, string>>({});
-  const [activeSection, setActiveSection] = useState("");
-
   const stats = getCompleteStats(content.stats);
   const testimonials = getCompleteTestimonials(content.testimonials);
-
-  // Reveal System & Nav Active State Observer
-  useEffect(() => {
-    const reveals = document.querySelectorAll("[data-reveal]");
-    document.body.classList.add("reveal-ready");
-
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealed");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
-    );
-
-    reveals.forEach((el) => revealObserver.observe(el));
-
-    const sections = document.querySelectorAll("section[id]");
-    const navObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { threshold: 0.3, rootMargin: "-10% 0px -60% 0px" }
-    );
-
-    sections.forEach((el) => navObserver.observe(el));
-
-    return () => {
-      revealObserver.disconnect();
-      navObserver.disconnect();
-    };
-  }, []);
-
-  // Attribution
-  useEffect(() => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const paramsToKeep = [
-        "utm_source",
-        "utm_medium",
-        "utm_campaign",
-        "utm_content",
-        "utm_term",
-        "gclid",
-        "fbclid",
-        "ttclid",
-      ];
-
-      const raw = sessionStorage.getItem("adsbooster_attr");
-      const sessionData = raw ? JSON.parse(raw) : {};
-
-      let updated = false;
-      for (const param of paramsToKeep) {
-        if (urlParams.has(param) && !sessionData[param]) {
-          sessionData[param] = urlParams.get(param);
-          updated = true;
-        }
-      }
-
-      if (!sessionData.landingUrl) {
-        sessionData.landingUrl = window.location.href.split("#")[0];
-        updated = true;
-      }
-
-      if (!sessionData.referrer && document.referrer) {
-        sessionData.referrer = document.referrer;
-        updated = true;
-      }
-
-      if (updated) {
-        sessionStorage.setItem("adsbooster_attr", JSON.stringify(sessionData));
-      }
-
-      queueMicrotask(() => setAttribution(sessionData));
-    } catch {
-      // Ignore storage errors
-    }
-
-    queueMicrotask(() => setStartedAt(new Date().toISOString()));
-  }, []);
-
-  const handleFieldChange =
-    (field: keyof LeadFormState) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setForm((current) => ({ ...current, [field]: event.target.value }));
-      setErrors((current) => ({ ...current, [field]: undefined }));
-      setServerMessage("");
-    };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const nextErrors: Partial<Record<keyof LeadFormState, string>> = {};
-
-    Object.entries(form).forEach(([key, value]) => {
-      if (key !== "company" && key !== "businessTypeOther" && !value.trim()) {
-        nextErrors[key as keyof LeadFormState] = "This field is required.";
-      }
-    });
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
-      setTimeout(() => {
-        const firstErrorKey = Object.keys(nextErrors)[0];
-        const el = document.getElementsByName(firstErrorKey)[0];
-        if (el) (el as HTMLElement).focus();
-      }, 0);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setServerMessage("");
-
-    try {
-      const payload = {
-        ...form,
-        startedAt,
-        utmSource: attribution.utm_source,
-        utmMedium: attribution.utm_medium,
-        utmCampaign: attribution.utm_campaign,
-        utmContent: attribution.utm_content,
-        utmTerm: attribution.utm_term,
-        clickId: attribution.gclid || attribution.fbclid || attribution.ttclid, // Retained for ad-tracking attribution in case TikTok clicks are routed via custom campaigns
-        landingUrl: attribution.landingUrl,
-        referrer: attribution.referrer,
-      };
-
-      const response = await fetch("/api/leads", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        if (data.fields) {
-          setErrors(data.fields);
-          setTimeout(() => {
-            const firstErrorKey = Object.keys(data.fields)[0];
-            const el = document.getElementsByName(firstErrorKey)[0];
-            if (el) (el as HTMLElement).focus();
-          }, 0);
-        } else {
-          setServerMessage(data.error ?? "Your enquiry could not be sent.");
-        }
-        return;
-      }
-
-      setForm(initialForm);
-      setErrors({});
-      setIsSent(true);
-    } catch {
-      setServerMessage("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const resetForm = () => {
-    setIsSent(false);
-    setForm(initialForm);
-    setErrors({});
-    setServerMessage("");
-    setStartedAt(new Date().toISOString());
-  };
+  const quoteHref = whatsappLink(content.pricing.quotePrefill);
 
   return (
     <main className="adsbooster-page">
+      <MotionController />
+
       <header className="site-header">
         <div className="container header-inner">
           <Link
@@ -253,29 +113,25 @@ export default function Home() {
             />
           </Link>
 
-          <nav className="nav-links nav-pills" aria-label="Main navigation">
-            <a href="#services" className={activeSection === "services" ? "active" : ""}>Services</a>
-            <a href="#process" className={activeSection === "process" ? "active" : ""}>Process</a>
-            <a href="#pricing" className={activeSection === "pricing" ? "active" : ""}>Pricing</a>
-            <a href="#faq" className={activeSection === "faq" ? "active" : ""}>FAQ</a>
-          </nav>
+          <NavPills items={content.nav} />
 
-          {WHATSAPP_NUMBER ? (
+          {hasWhatsApp ? (
             <a
               className="whatsapp-button header-whatsapp"
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Chat on WhatsApp"
             >
-              <MessageSquareText size={18} />
-              WhatsApp
+              <WhatsAppIcon />
+              <span className="header-whatsapp-label">WhatsApp</span>
             </a>
           ) : null}
         </div>
       </header>
 
-      <section className="hero-section">
-        <div className="hero-shapes" aria-hidden="true">
+      <section className="hero-section" data-hero>
+        <div className="hero-shapes" aria-hidden="true" data-pause-offscreen>
           <div className="shape shape-1" />
           <div className="shape shape-2" />
         </div>
@@ -292,30 +148,37 @@ export default function Home() {
 
         <div className="container hero-grid">
           <div className="hero-copy">
-            <div className="eyebrow" data-reveal>{content.hero.eyebrow}</div>
+            <div className="eyebrow hero-rise" style={rise(0)}>
+              {content.hero.eyebrow}
+            </div>
 
-            <h1 data-reveal data-reveal-delay="100">{content.hero.headline}</h1>
+            <h1>{content.hero.headline}</h1>
 
-            <p className="hero-subline" data-reveal data-reveal-delay="200">{content.hero.subline}</p>
+            <p className="hero-subline hero-rise" style={rise(1)}>
+              {content.hero.subline}
+            </p>
 
-            <ul className="hero-checklist" data-reveal data-reveal-delay="300">
-              {content.hero.checklist.map((item) => (
-                <li key={item}>
-                  <Check size={18} />
+            <ul className="hero-checklist">
+              {content.hero.checklist.map((item, i) => (
+                <li key={item} className="hero-rise" style={rise(2 + i)}>
+                  <Check size={18} aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="cta-stack" data-reveal data-reveal-delay="400">
-              {WHATSAPP_NUMBER ? (
+            <div
+              className="cta-stack hero-rise"
+              style={rise(2 + content.hero.checklist.length)}
+            >
+              {hasWhatsApp ? (
                 <a
                   className="whatsapp-button full-width"
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageSquareText size={18} />
+                  <WhatsAppIcon />
                   Chat on WhatsApp
                 </a>
               ) : null}
@@ -325,199 +188,23 @@ export default function Home() {
             </div>
           </div>
 
-          <aside id="audit" className="audit-card" data-reveal data-reveal-delay="500">
-            <div className="audit-card-inner">
-              {isSent ? (
-                <>
-                  <div className="small-label">Free ad audit</div>
-                  <h2>Thanks, we have your details.</h2>
-                  <div className="success-box">
-                    <Check size={18} />
-                    <span>Enquiry received</span>
-                  </div>
-                  {WHATSAPP_NUMBER ? (
-                    <a
-                      className="whatsapp-button full-width"
-                      href={whatsappHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <MessageSquareText size={18} />
-                      Chat on WhatsApp
-                    </a>
-                  ) : null}
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={resetForm}
-                  >
-                    Send another enquiry
-                  </button>
-                </>
-              ) : (
-                <form onSubmit={handleSubmit} noValidate>
-                  <div className="small-label">Free ad audit</div>
-                  <h2>Tell us about your business.</h2>
-
-                  {/* Honeypot field */}
-                  <input
-                    type="text"
-                    name="company"
-                    value={form.company}
-                    onChange={handleFieldChange("company")}
-                    tabIndex={-1}
-                    autoComplete="off"
-                    aria-label="Company (leave blank)"
-                    style={{
-                      position: "absolute",
-                      width: "1px",
-                      height: "1px",
-                      padding: 0,
-                      margin: "-1px",
-                      overflow: "hidden",
-                      clip: "rect(0, 0, 0, 0)",
-                      whiteSpace: "nowrap",
-                      border: 0,
-                    }}
-                  />
-
-                  <label className="field-block">
-                    <span>Your name</span>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleFieldChange("name")}
-                      placeholder="Ali Khan"
-                    />
-                    {errors.name ? <small>{errors.name}</small> : null}
-                  </label>
-
-                  <label className="field-block">
-                    <span>Email address</span>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleFieldChange("email")}
-                      placeholder="ali@example.com"
-                    />
-                    {errors.email ? <small>{errors.email}</small> : null}
-                  </label>
-
-                  <label className="field-block">
-                    <span>What kind of business do you have?</span>
-                    <select
-                      name="businessType"
-                      value={form.businessType}
-                      onChange={handleFieldChange("businessType")}
-                    >
-                      <option value="" disabled>Select one</option>
-                      <option>E-commerce</option>
-                      <option>Clinic / Healthcare</option>
-                      <option>Real Estate / Travel / Visa</option>
-                      <option>B2B / Agency</option>
-                      <option>Other</option>
-                    </select>
-                    {errors.businessType ? (
-                      <small>{errors.businessType}</small>
-                    ) : null}
-                  </label>
-
-                  {form.businessType === "Other" && (
-                    <label className="field-block slide-down">
-                      <span>Please specify</span>
-                      <input
-                        type="text"
-                        name="businessTypeOther"
-                        value={form.businessTypeOther}
-                        onChange={handleFieldChange("businessTypeOther")}
-                        placeholder="e.g. Software house"
-                        maxLength={80}
-                      />
-                    </label>
-                  )}
-
-                  <label className="field-block">
-                    <span>City</span>
-                    <input
-                      type="text"
-                      name="city"
-                      value={form.city}
-                      onChange={handleFieldChange("city")}
-                      placeholder="Lahore"
-                    />
-                    {errors.city ? <small>{errors.city}</small> : null}
-                  </label>
-
-                  <label className="field-block">
-                    <span>WhatsApp number</span>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleFieldChange("phone")}
-                      placeholder="03XX XXXXXXX"
-                    />
-                    {errors.phone ? <small>{errors.phone}</small> : null}
-                  </label>
-
-                  <label className="field-block">
-                    <span>Monthly ad budget</span>
-                    <select
-                      name="budget"
-                      value={form.budget}
-                      onChange={handleFieldChange("budget")}
-                    >
-                      <option value="" disabled>
-                        Choose a range
-                      </option>
-                      <option>Under 50k PKR</option>
-                      <option>50k–150k PKR</option>
-                      <option>150k–500k PKR</option>
-                      <option>500k+ PKR</option>
-                    </select>
-                    {errors.budget ? <small>{errors.budget}</small> : null}
-                  </label>
-
-                  {serverMessage ? (
-                    <div className="form-error">{serverMessage}</div>
-                  ) : null}
-
-                  <button
-                    type="submit"
-                    className="primary-button"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Sending..." : "Send my details"}
-                    {!isSubmitting ? <ArrowRight size={16} /> : null}
-                  </button>
-                </form>
-              )}
-            </div>
+          <aside id="audit" className="audit-card">
+            <LeadForm whatsappHref={whatsappHref} />
           </aside>
         </div>
       </section>
 
       <section id="services" className="page-section surface-section">
         <div className="container">
-          <div className="section-heading-block">
-            <div className="eyebrow" data-reveal>{content.services.eyebrow}</div>
-            <h2 data-reveal data-reveal-delay="100">{content.services.headline}</h2>
-            <p className="section-lead" data-reveal data-reveal-delay="200">
-              {content.services.subline}
-            </p>
+          <div className="section-heading-block" {...reveal()}>
+            <div className="eyebrow">{content.services.eyebrow}</div>
+            <h2>{content.services.headline}</h2>
+            <p className="section-lead">{content.services.subline}</p>
           </div>
 
           <div className="card-grid four-up">
-            {content.services.items.map(({ title, description, icon: Icon }, i) => (
-              <article key={title} className="content-card service-card" data-reveal data-reveal-delay={300 + i * 100}>
-                <div className="icon-wrap">
-                  <Icon size={18} />
-                </div>
-                <h3>{title}</h3>
-                <p>{description}</p>
-              </article>
+            {content.services.items.map((item, i) => (
+              <ServiceCard key={item.title} {...item} index={i} />
             ))}
           </div>
         </div>
@@ -525,140 +212,159 @@ export default function Home() {
 
       <section id="process" className="page-section paper-section">
         <div className="container">
-          <div className="section-heading-block">
-            <div className="eyebrow" data-reveal>{content.process.eyebrow}</div>
-            <h2 data-reveal data-reveal-delay="100">{content.process.headline}</h2>
+          <div className="section-heading-block" {...reveal()}>
+            <div className="eyebrow">{content.process.eyebrow}</div>
+            <h2>{content.process.headline}</h2>
           </div>
 
-          <div className="process-timeline">
+          <ol className="process-timeline">
             {content.process.steps.map(({ step, title, body }, i) => (
-              <article key={step} className="content-card process-card" data-reveal data-reveal-delay={200 + i * 100}>
-                <div className="step-label">{step}</div>
+              <li key={step} className="process-step" {...reveal(i)}>
+                <span className="step-badge">{step}</span>
                 <h3>{title}</h3>
                 <p>{body}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {stats.length > 0 && (
-        <section className="stats-band">
+      {stats.length > 0 ? (
+        <section className="stats-band" data-count-scope>
           <div className="container stats-grid">
-            {stats.map(({ value, label }, i) => (
-              <div key={label} className="stat-item" data-reveal data-reveal-delay={i * 100}>
+            {stats.map(({ value, prefix, suffix, label }) => (
+              <div key={label} className="stat-item">
                 <div className="stat-value">
-                  <CountUp end={value} enableScrollSpy scrollSpyOnce />
+                  <CountUp value={value} prefix={prefix} suffix={suffix} />
                 </div>
                 <div className="stat-label">{label}</div>
               </div>
             ))}
           </div>
         </section>
-      )}
+      ) : null}
 
-      {testimonials.length > 0 && (
-        <section className="page-section paper-section">
+      {testimonials.length > 0 ? (
+        <section id="testimonials" className="page-section paper-section">
           <div className="container">
-            <div className="section-heading-block narrow">
-              <div className="eyebrow" data-reveal>Clients</div>
-              <h2 data-reveal data-reveal-delay="100">What our clients say</h2>
+            <div className="section-heading-block narrow" {...reveal()}>
+              <div className="eyebrow">Clients</div>
+              <h2>What our clients say</h2>
             </div>
 
             <div className="testimonial-grid">
-              {testimonials.map(({ quote, name, role, business, city }, i) => (
-                <blockquote key={quote} className="testimonial-box" data-reveal data-reveal-delay={200 + i * 100}>
-                  <p>“{quote}”</p>
-                  <footer>
-                    <strong>{name}</strong>
-                    <span>{role}</span>
-                    <span>
-                      {business}, {city}
-                    </span>
-                  </footer>
-                </blockquote>
-              ))}
+              {testimonials.map(
+                ({ quote, name, role, business, city }, i) => (
+                  <blockquote
+                    key={quote}
+                    className="testimonial-box"
+                    {...reveal(i)}
+                  >
+                    <p>{quote}</p>
+                    <footer>
+                      <strong>{name}</strong>
+                      <span>{role}</span>
+                      <span>
+                        {business}, {city}
+                      </span>
+                    </footer>
+                  </blockquote>
+                ),
+              )}
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       <section id="pricing" className="page-section surface-section">
         <div className="container">
-          <div className="section-heading-block narrow">
-            <div className="eyebrow" data-reveal>{content.pricing.eyebrow}</div>
-            <h2 data-reveal data-reveal-delay="100">{content.pricing.headline}</h2>
-            <p className="section-lead" data-reveal data-reveal-delay="200">
-              {content.pricing.subline}
-            </p>
+          <div className="section-heading-block narrow" {...reveal()}>
+            <div className="eyebrow">{content.pricing.eyebrow}</div>
+            <h2>{content.pricing.headline}</h2>
+            <p className="section-lead">{content.pricing.subline}</p>
           </div>
 
           <div className="pricing-grid">
-            {content.pricing.plans.map(({ name, price, description, features }, i) => (
-              <article key={name} className="pricing-card" data-reveal data-reveal-delay={300 + i * 100}>
-                <div className="plan-name">{name}</div>
-                <div className="plan-price">
-                  {price.includes("___") || !price.trim() ? "Custom quote" : price}
-                </div>
-                <p>{description}</p>
-                <ul>
-                  {features.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                </ul>
-                <a href="#audit" className="secondary-button">
-                  Get a free ad audit
-                </a>
-              </article>
-            ))}
+            {content.pricing.plans.map(
+              ({ name, price, description, features }, i) => {
+                const hasPrice = !isPlaceholder(price);
+                const asksOnWhatsApp = !hasPrice && quoteHref;
+                return (
+                  <article key={name} className="pricing-card" {...reveal(i)}>
+                    <div className="plan-name">{name}</div>
+                    <div className="plan-price">
+                      {hasPrice ? price : "Custom quote"}
+                    </div>
+                    <p>{description}</p>
+                    <ul>
+                      {features.map((feature) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                    </ul>
+                    {asksOnWhatsApp ? (
+                      <a
+                        className="whatsapp-button"
+                        href={quoteHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <WhatsAppIcon />
+                        Get a quote on WhatsApp
+                      </a>
+                    ) : (
+                      <a href="#audit" className="secondary-button">
+                        Get a free ad audit
+                      </a>
+                    )}
+                  </article>
+                );
+              },
+            )}
           </div>
         </div>
       </section>
 
       <section id="faq" className="page-section paper-section">
         <div className="container faq-wrap">
-          <div className="section-heading-block narrow">
-            <div className="eyebrow" data-reveal>{content.faqs.eyebrow}</div>
-            <h2 data-reveal data-reveal-delay="100">{content.faqs.headline}</h2>
+          <div className="section-heading-block narrow" {...reveal()}>
+            <div className="eyebrow">{content.faqs.eyebrow}</div>
+            <h2>{content.faqs.headline}</h2>
           </div>
 
           <div className="faq-list">
             {content.faqs.items.map(({ question, answer }, i) => (
-              <details key={question} className="faq-item" data-reveal data-reveal-delay={200 + i * 50}>
-                <summary>
-                  {question}
-                  <div className="faq-icon"><Check size={18} /></div>
-                </summary>
-                <div className="faq-answer">
-                  <p>{answer}</p>
-                </div>
-              </details>
+              <FaqItem
+                key={question}
+                question={question}
+                answer={answer}
+                index={i}
+              />
             ))}
           </div>
         </div>
       </section>
 
-      <section className="page-section final-cta-wrap" data-reveal>
+      <section className="page-section final-cta-wrap">
         <div className="container">
-          <div className="final-cta">
+          <div className="final-cta" data-pause-offscreen {...reveal()}>
             <div className="final-cta-copy">
               <h2>{content.finalCta.headline}</h2>
               <p>{content.finalCta.subline}</p>
             </div>
             <div className="final-cta-actions">
-              {WHATSAPP_NUMBER ? (
+              {hasWhatsApp ? (
                 <a
                   className="whatsapp-button full-width"
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageSquareText size={18} />
+                  <WhatsAppIcon />
                   Chat on WhatsApp
                 </a>
               ) : null}
               <a href="#audit" className="secondary-button full-width">
-                Send an enquiry
+                Get a free ad audit
               </a>
             </div>
           </div>
@@ -667,26 +373,108 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <div className="footer-main">
-            <div className="footer-brand">
-              <Image
-                src="/icon1.png"
-                alt="AdsBoosters.pk"
-                width={72}
-                height={72}
-                className="footer-logo-image"
-              />
-              <div>
-                <strong>AdsBoosters.pk</strong>
-                <p>{content.footer.tagline}</p>
-              </div>
+          <div className="footer-brand">
+            <Image
+              src="/icon1.png"
+              alt="AdsBoosters.pk"
+              width={72}
+              height={72}
+              className="footer-logo-image"
+            />
+            <div>
+              <strong>AdsBoosters.pk</strong>
+              <p>{content.footer.tagline}</p>
             </div>
           </div>
+
+          <div className="footer-columns">
+            <div className="footer-column">
+              <h3>
+                <Compass size={15} aria-hidden="true" /> Explore
+              </h3>
+              {content.nav.map(({ id, label }) => (
+                <a key={id} href={`#${id}`} className="link-underline">
+                  {label}
+                </a>
+              ))}
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <Mail size={15} aria-hidden="true" /> Contact
+              </h3>
+              <a
+                href={`mailto:${content.footer.email}`}
+                className="link-underline"
+              >
+                Email us
+              </a>
+              {hasWhatsApp ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline"
+                >
+                  Chat on WhatsApp
+                </a>
+              ) : null}
+              <span>
+                <MapPin size={15} aria-hidden="true" /> Pakistan · Serving
+                nationwide
+              </span>
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <ShieldCheck size={15} aria-hidden="true" /> Legal
+              </h3>
+              <Link href="/privacy" className="link-underline">
+                Privacy policy
+              </Link>
+              <Link href="/terms" className="link-underline">
+                Terms of service
+              </Link>
+            </div>
+
+            <div className="footer-column">
+              <h3>
+                <ExternalLink size={15} aria-hidden="true" /> Follow
+              </h3>
+              {content.footer.social.map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+
           <div className="footer-meta">
-            <span className="copyright">{content.footer.copyright}</span>
+            <div className="copyright">{content.footer.copyright}</div>
+            <div className="footer-platforms">{content.footer.platforms}</div>
+            <div className="footer-credit">
+              Designed and developed by{" "}
+              <a
+                href={content.footer.credit.href}
+                target="_blank"
+                rel="noreferrer"
+                className="link-underline"
+              >
+                {content.footer.credit.label}{" "}
+                <ExternalLink size={13} aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
+
+      {hasWhatsApp ? <StickyWhatsApp href={whatsappHref} /> : null}
     </main>
   );
 }
