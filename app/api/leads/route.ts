@@ -98,6 +98,11 @@ export async function POST(request: NextRequest) {
 
   const leadId = crypto.randomUUID();
   const createdAt = new Date().toISOString();
+  // The sheet has one "Business type" column, so the free text rides along with it.
+  const businessType =
+    parsed.businessType === "Other" && parsed.businessTypeOther
+      ? `Other: ${parsed.businessTypeOther}`
+      : parsed.businessType;
 
   try {
     const sheetResponse = await fetch(env.GOOGLE_SHEETS_WEBHOOK_URL, {
@@ -109,9 +114,7 @@ export async function POST(request: NextRequest) {
         createdAt,
         name: parsed.name,
         email: parsed.email,
-        businessType: parsed.businessType === "Other" && parsed.businessTypeOther 
-          ? `Other: ${parsed.businessTypeOther}` 
-          : parsed.businessType,
+        businessType,
         city: parsed.city,
         phone: parsed.phone,
         budget: parsed.budget,
@@ -163,7 +166,7 @@ export async function POST(request: NextRequest) {
           from: env.RESEND_FROM_EMAIL,
           to: env.LEAD_NOTIFICATION_EMAIL,
           subject: notificationSubject,
-          html: buildNotificationEmail(parsed, leadId),
+          html: buildNotificationEmail({ ...parsed, businessType }, leadId),
         }),
       ];
 
@@ -174,7 +177,7 @@ export async function POST(request: NextRequest) {
             from: env.RESEND_FROM_EMAIL,
             to: parsed.email,
             subject: "We received your AdsBoosters.pk enquiry",
-            html: buildLeadConfirmationEmail(parsed.name, parsed.businessType),
+            html: buildLeadConfirmationEmail(parsed.name),
           }),
         );
       }
@@ -231,8 +234,8 @@ function escapeHtml(value: string) {
   );
 }
 
-function buildLeadConfirmationEmail(name: string, businessType: string) {
-  return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#0b0e14;line-height:1.6"><div style="background:#0f2b4c;padding:28px 32px;color:#fff"><h1 style="margin:0;font-size:24px">AdsBoosters.pk</h1></div><div style="padding:32px;border:1px solid #e1e4e8"><p>Hi ${escapeHtml(name)},</p><p>Thanks for reaching out about growing your ${escapeHtml(businessType.toLowerCase())}. We have received your details and will review your enquiry.</p><p>Our team will contact you shortly to discuss your free ad audit and the best next step for your business.</p><p style="margin-top:28px">Regards,<br><strong>AdsBoosters.pk</strong></p></div></div>`;
+function buildLeadConfirmationEmail(name: string) {
+  return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#0b0e14;line-height:1.6"><div style="background:#0f2b4c;padding:28px 32px;color:#fff"><h1 style="margin:0;font-size:24px">AdsBoosters.pk</h1></div><div style="padding:32px;border:1px solid #e1e4e8"><p>Hi ${escapeHtml(name)},</p><p>Thanks for reaching out about growing your business. We have received your details and will review your enquiry.</p><p>Our team will contact you shortly to discuss your free ad audit and the best next step for your business.</p><p style="margin-top:28px">Regards,<br><strong>AdsBoosters.pk</strong></p></div></div>`;
 }
 
 function buildNotificationEmail(
