@@ -812,10 +812,14 @@ img {
 /* Answer height animates 0fr to 1fr; FaqItem toggles data-open for it. */
 .faq-answer {
   display: grid;
+  grid-template-rows: 0fr;
+}
+
+.faq-item[open] .faq-answer {
   grid-template-rows: 1fr;
 }
 
-.faq-item[data-open="false"] .faq-answer {
+.faq-item[open][data-open="false"] .faq-answer {
   grid-template-rows: 0fr;
 }
 
