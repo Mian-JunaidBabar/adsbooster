@@ -57,15 +57,6 @@ function ServiceCard({
     </>
   );
   const className = "content-card service-card";
-
-  if (href === undefined) {
-    return (
-      <article className={className} data-accent={accent} {...reveal(index)}>
-        {inner}
-      </article>
-    );
-  }
-
   const target = href || "#audit";
   const external = target.startsWith("http");
   return (
