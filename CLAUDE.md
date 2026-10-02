@@ -1,6 +1,6 @@
 # AdsBoosters.pk
 
-Single-page paid-ads landing page for a Pakistani performance ads agency, plus a lead-handling backend and admin panel. Audiences: health clinics, overseas visa consultants, other local businesses. Traffic comes from Meta and Google ads, mostly on phones over mobile data. The page's one job is to start a WhatsApp chat, or capture a lead through the form or a booked call.
+Single-page paid-ads landing page for a Pakistani performance ads agency, plus a lead-handling backend and admin panel. One audience: any business owner who wants more leads, sales or reach from ads and social media. No industry is targeted; the lead form records each lead's industry so the owners can see which one responds best. Traffic comes from Meta and Google ads, mostly on phones over mobile data. The page's one job is to start a WhatsApp chat, or capture a lead through the form.
 
 ## Sources of truth
 
@@ -33,12 +33,24 @@ Next.js (App Router) + TypeScript strict + Tailwind or CSS variables from tokens
 
 - WhatsApp green is used only on WhatsApp buttons.
 - No purple gradients, glassmorphism, emoji icons, stock photos, or fake counters.
-- Motion: ease-out only, transform and opacity only, max 400ms, respect prefers-reduced-motion.
+- Motion (one system, see `app/globals.css`):
+  - Animate `transform` and `opacity` only, plus `background-color`, `border-color`, `box-shadow` and `color` on hover. Never width, height, top, left or margin. The FAQ answer (`grid-template-rows` 0fr to 1fr) is the single allowed exception.
+  - Ease `--ease-out`. Durations are tokens: `--dur-fast` 160ms (hover, press), `--dur-base` 300ms (colour changes), `--dur-reveal` 600ms (scroll reveals). Only the count-up (1600ms), the process line draw (800ms), the FAQ (250ms) and the ambient loops (hero drift, final CTA bar) run longer.
+  - Hover rules live inside `@media (hover: hover) and (pointer: fine)` and have a matching `:focus-visible` state. Movement is also gated by `prefers-reduced-motion: no-preference`; with reduced motion nothing moves, colour changes stay, reveals show content at once and the count-up shows the final value.
+  - Content is never hidden at rest. Reveals use `data-reveal` and `MotionController`, and CSS only hides content once JS has added `reveal-ready`. Never reveal the hero H1, the hero WhatsApp button or the form.
+  - Small movement only: lifts 2 to 4px, reveals 12 to 16px, scale at most 1.02 (the icon badge hover is the one 1.06 exception). No bounce, spin or flash. No animation library.
 - Headlines max 2 lines at 390px. The WhatsApp button must be visible in the first mobile screen.
 
 ## Commands
 
-Fill these in during Phase 0 once the project exists: install, dev, build, lint, typecheck, test, e2e, db migrate.
+- install: `npm install`
+- dev: `npm run dev`
+- build: `npm run build` (needs `LEAD_NOTIFICATION_EMAIL` in production mode)
+- lint: `npm run lint`
+- typecheck: `npm run typecheck`
+- unit tests: `npm test`
+- e2e: `npx playwright install chromium`, then `npm run e2e` (builds with `build:e2e`, starts a fake sheet webhook on :4000)
+- db migrate: `npm run db:migrate`
 
 ## Definition of done for any change
 

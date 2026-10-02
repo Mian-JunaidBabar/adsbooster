@@ -23,7 +23,52 @@ const organizationSchema = {
   "@type": "Organization",
   name: "AdsBoosters.pk",
   url: siteUrl,
-  description: "Performance advertising agency for Pakistani businesses.",
+  description:
+    "Google and Meta ads, Google ranking and social media management for businesses in Pakistan.",
+  knowsAbout: [
+    "Google Ads",
+    "Meta Ads",
+    "Google search ranking (SEO)",
+    "Social media management",
+  ],
+  makesOffer: [
+    {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Google Ads",
+        description:
+          "Search and Maps ads that bring enquiries from people already looking for your business.",
+      },
+    },
+    {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Meta Ads",
+        description:
+          "Facebook and Instagram campaigns with lead forms and click-to-WhatsApp ads.",
+      },
+    },
+    {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Google Page Ranking",
+        description:
+          "Help your business show higher on Google Search and Maps.",
+      },
+    },
+    {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Social media management",
+        description:
+          "Monthly content calendar, posting and inbox replies for your pages.",
+      },
+    },
+  ],
   areaServed: { "@type": "Country", name: "Pakistan" },
   sameAs: [
     "https://www.facebook.com/profile.php?id=61593563594054",
@@ -44,9 +89,13 @@ const websiteSchema = {
   inLanguage: "en-PK",
 };
 
+const SEO_TITLE = "AdsBoosters.pk | Google & Meta Ads Agency in Pakistan";
+const SEO_DESCRIPTION =
+  "Get more leads and sales from Google and Meta ads and social media. We run your campaigns and report every week in plain numbers. Free ad audit.";
+
 export const metadata: Metadata = {
-  title: "AdsBoosters.pk | Performance Ads Agency",
-  description: "Performance ads for businesses in Pakistan.",
+  title: SEO_TITLE,
+  description: SEO_DESCRIPTION,
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
@@ -55,13 +104,13 @@ export const metadata: Metadata = {
     locale: "en_PK",
     url: siteUrl,
     siteName: "AdsBoosters.pk",
-    title: "AdsBoosters.pk | Performance Ads Agency",
-    description: "Performance ads for businesses in Pakistan.",
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
   },
   twitter: {
     card: "summary",
-    title: "AdsBoosters.pk | Performance Ads Agency",
-    description: "Performance ads for businesses in Pakistan.",
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
   },
   icons: {
     icon: [
