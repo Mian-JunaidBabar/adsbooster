@@ -23,8 +23,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "AdsBoosters.pk",
   url: siteUrl,
-  description:
-    "Performance advertising agency for clinics, visa consultants and local businesses in Pakistan.",
+  description: "Performance advertising agency for Pakistani businesses.",
   areaServed: { "@type": "Country", name: "Pakistan" },
   sameAs: [
     "https://www.facebook.com/profile.php?id=61593563594054",
@@ -47,8 +46,7 @@ const websiteSchema = {
 
 export const metadata: Metadata = {
   title: "AdsBoosters.pk | Performance Ads Agency",
-  description:
-    "Performance ads for clinics, visa consultants and local businesses in Pakistan.",
+  description: "Performance ads for businesses in Pakistan.",
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
@@ -58,14 +56,12 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: "AdsBoosters.pk",
     title: "AdsBoosters.pk | Performance Ads Agency",
-    description:
-      "Performance ads for clinics, visa consultants and local businesses in Pakistan.",
+    description: "Performance ads for businesses in Pakistan.",
   },
   twitter: {
     card: "summary",
     title: "AdsBoosters.pk | Performance Ads Agency",
-    description:
-      "Performance ads for clinics, visa consultants and local businesses in Pakistan.",
+    description: "Performance ads for businesses in Pakistan.",
   },
   icons: {
     icon: [

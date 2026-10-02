@@ -1,6 +1,6 @@
 # AdsBoosters.pk
 
-Single-page paid-ads landing page for a Pakistani performance ads agency, plus a lead-handling backend and admin panel. Audiences: health clinics, overseas visa consultants, other local businesses. Traffic comes from Meta, Google and TikTok ads, mostly on phones over mobile data. The page's one job is to start a WhatsApp chat, or capture a lead through the form or a booked call.
+Single-page paid-ads landing page for a Pakistani performance ads agency, plus a lead-handling backend and admin panel. Audiences: health clinics, overseas visa consultants, other local businesses. Traffic comes from Meta and Google ads, mostly on phones over mobile data. The page's one job is to start a WhatsApp chat, or capture a lead through the form or a booked call.
 
 ## Sources of truth
 

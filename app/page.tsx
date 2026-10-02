@@ -4,19 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  CalendarDays,
   Check,
-  Compass,
-  ExternalLink,
-  Mail,
   MapPin,
-  Megaphone,
   MessageSquareText,
-  Play,
-  Search,
-  ShieldCheck,
 } from "lucide-react";
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from "react";
+import { content, getCompleteStats, getCompleteTestimonials } from "../lib/content";
+import CountUp from "react-countup";
 
 const rawWhatsApp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
 const WHATSAPP_NUMBER = rawWhatsApp.replace(/\D/g, "");
@@ -27,169 +21,15 @@ if (process.env.NODE_ENV === "production" && !WHATSAPP_NUMBER) {
   );
 }
 
-const audienceContent = {
-  other: {
-    label: "Other Businesses",
-    type: "Local business",
-    headline: "Leads and sales from ads that pay back.",
-    sub: "Google, Meta and TikTok campaigns for local businesses, managed weekly and reported in plain numbers: enquiries, cost per lead, sales.",
-    proof: "Retail, real estate, education, restaurants and more",
-    prefill:
-      "Assalam o Alaikum, mujhe apne business ke liye ads se leads chahiye.",
-  },
-  clinic: {
-    label: "Clinics",
-    type: "Clinic",
-    headline: "Fill your clinic’s appointment book.",
-    sub: "Meta and Google campaigns that bring booking enquiries straight to your front desk on WhatsApp, tracked back to the ad that sent them.",
-    proof: "Campaigns for dental, skin and physiotherapy clinics",
-    prefill:
-      "Assalam o Alaikum, meri clinic hai aur mujhe ads se zyada bookings chahiye.",
-  },
-  visa: {
-    label: "Visa Consultants",
-    type: "Visa consultancy",
-    headline: "Serious leads for your visa consultancy.",
-    sub: "Ads that reach people already planning to study or work abroad, filtered so your counsellors spend time on real applicants.",
-    proof: "Lead campaigns for study-abroad and work-visa consultants",
-    prefill:
-      "Assalam o Alaikum, main visa consultant hoon aur mujhe qualified leads chahiye.",
-  },
-} as const;
-
-const services = [
-  {
-    title: "Google Ads",
-    description:
-      "Search and Maps ads for people already looking for what you offer, in your city.",
-    icon: Search,
-  },
-  {
-    title: "Meta Ads",
-    description:
-      "Facebook and Instagram campaigns with lead forms and click-to-WhatsApp ads.",
-    icon: Megaphone,
-  },
-  {
-    title: "TikTok Ads",
-    description:
-      "Short video ads that reach younger buyers at a lower cost per enquiry.",
-    icon: Play,
-  },
-  {
-    title: "Social media management",
-    description:
-      "Monthly content calendar, posting and inbox replies so your pages stay active.",
-    icon: CalendarDays,
-  },
-];
-
-const processSteps = [
-  {
-    step: "01",
-    title: "Free audit",
-    body: "We review your current ads or market and tell you what we would change.",
-  },
-  {
-    step: "02",
-    title: "Plan and creatives",
-    body: "Targeting, budget split and ad creatives, agreed with you before launch.",
-  },
-  {
-    step: "03",
-    title: "Launch",
-    body: "Campaigns go live with tracking on every form, call and WhatsApp chat.",
-  },
-  {
-    step: "04",
-    title: "Optimise and report",
-    body: "Weekly changes and a plain report: leads, cost per lead, what is next.",
-  },
-];
-
-const stats = [
-  { value: "[00]", label: "Active clients" },
-  { value: "[00k]", label: "Leads delivered" },
-  { value: "[PKR 000]", label: "Avg. cost per lead" },
-  { value: "[00]", label: "Cities served" },
-];
-
-const testimonials = [
-  {
-    quote:
-      "[Real client quote about results, e.g. leads per month or cost per lead before and after.]",
-    name: "[Client name]",
-    role: "[Role]",
-    business: "[Business]",
-    city: "[City]",
-  },
-  {
-    quote:
-      "[Second real client quote. Use their words, lightly edited for length.]",
-    name: "[Client name]",
-    role: "[Role]",
-    business: "[Business]",
-    city: "[City]",
-  },
-];
-
-const pricing = [
-  {
-    name: "Ads management",
-    price: "PKR ___ / month",
-    description: "+ ad spend, paid directly to the platform",
-    features: [
-      "Google, Meta or TikTok campaigns",
-      "Ad creatives and copy",
-      "Lead tracking to WhatsApp",
-      "Weekly report and call",
-    ],
-  },
-  {
-    name: "Social media management",
-    price: "PKR ___ / month",
-    description: "Ad spend not included",
-    features: [
-      "Monthly content calendar",
-      "Posts and stories designed",
-      "Inbox and comment replies",
-      "Monthly performance summary",
-    ],
-  },
-];
-
-const faqs = [
-  {
-    question: "Is ad spend included in your fee?",
-    answer:
-      "No. Ad spend is always separate and paid directly to Google, Meta or TikTok. Our fee covers planning, creatives and management.",
-  },
-  {
-    question: "How soon will I get leads?",
-    answer:
-      "Most campaigns start bringing enquiries in the first week after launch. We tune targeting in the first month to lower your cost per lead.",
-  },
-  {
-    question: "Do I need a minimum ad budget?",
-    answer:
-      "We recommend starting from 50k PKR a month in ad spend so there is enough data to optimise. We will tell you honestly if your budget is too small.",
-  },
-  {
-    question: "Kya aap sirf Lahore/Karachi mein kaam karte hain?",
-    answer:
-      "Nahi. Hum poore Pakistan mein businesses ke liye ads chalate hain, aur calls aur WhatsApp par kaam karte hain.",
-  },
-  {
-    question: "Is there a long contract?",
-    answer:
-      "No. We work month to month. You own your ad accounts, pages and data.",
-  },
-];
+const whatsappHref = WHATSAPP_NUMBER
+  ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(content.hero.whatsappPrefill)}`
+  : "";
 
 type LeadFormState = {
   name: string;
   email: string;
   businessType: string;
+  businessTypeOther: string;
   city: string;
   phone: string;
   budget: string;
@@ -199,7 +39,8 @@ type LeadFormState = {
 const initialForm: LeadFormState = {
   name: "",
   email: "",
-  businessType: "Local business",
+  businessType: "",
+  businessTypeOther: "",
   city: "",
   phone: "",
   budget: "",
@@ -207,23 +48,58 @@ const initialForm: LeadFormState = {
 };
 
 export default function Home() {
-  const [audience, setAudience] =
-    useState<keyof typeof audienceContent>("other");
   const [form, setForm] = useState<LeadFormState>(initialForm);
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof LeadFormState, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadFormState, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
   const [startedAt, setStartedAt] = useState("");
   const [attribution, setAttribution] = useState<Record<string, string>>({});
+  const [activeSection, setActiveSection] = useState("");
 
-  const audienceDetails = audienceContent[audience];
-  const whatsappHref = WHATSAPP_NUMBER
-    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(audienceDetails.prefill)}`
-    : "";
+  const stats = getCompleteStats(content.stats);
+  const testimonials = getCompleteTestimonials(content.testimonials);
 
+  // Reveal System & Nav Active State Observer
+  useEffect(() => {
+    const reveals = document.querySelectorAll("[data-reveal]");
+    document.body.classList.add("reveal-ready");
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    reveals.forEach((el) => revealObserver.observe(el));
+
+    const sections = document.querySelectorAll("section[id]");
+    const navObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: "-10% 0px -60% 0px" }
+    );
+
+    sections.forEach((el) => navObserver.observe(el));
+
+    return () => {
+      revealObserver.disconnect();
+      navObserver.disconnect();
+    };
+  }, []);
+
+  // Attribution
   useEffect(() => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -264,43 +140,12 @@ export default function Home() {
       }
 
       queueMicrotask(() => setAttribution(sessionData));
-
-      const forParam = urlParams.get("for");
-      queueMicrotask(() => {
-        if (forParam === "clinics" || forParam === "clinic") {
-          setAudience("clinic");
-          setForm((prev) => ({
-            ...prev,
-            businessType: audienceContent.clinic.type,
-          }));
-        } else if (forParam === "visa") {
-          setAudience("visa");
-          setForm((prev) => ({
-            ...prev,
-            businessType: audienceContent.visa.type,
-          }));
-        } else {
-          setAudience("other");
-          setForm((prev) => ({
-            ...prev,
-            businessType: audienceContent.other.type,
-          }));
-        }
-      });
     } catch {
       // Ignore storage errors
     }
 
     queueMicrotask(() => setStartedAt(new Date().toISOString()));
   }, []);
-
-  const selectAudience = (nextAudience: keyof typeof audienceContent) => {
-    setAudience(nextAudience);
-    setForm((current) => ({
-      ...current,
-      businessType: audienceContent[nextAudience].type,
-    }));
-  };
 
   const handleFieldChange =
     (field: keyof LeadFormState) =>
@@ -316,7 +161,7 @@ export default function Home() {
     const nextErrors: Partial<Record<keyof LeadFormState, string>> = {};
 
     Object.entries(form).forEach(([key, value]) => {
-      if (key !== "company" && !value.trim()) {
+      if (key !== "company" && key !== "businessTypeOther" && !value.trim()) {
         nextErrors[key as keyof LeadFormState] = "This field is required.";
       }
     });
@@ -337,14 +182,13 @@ export default function Home() {
     try {
       const payload = {
         ...form,
-        audience,
         startedAt,
         utmSource: attribution.utm_source,
         utmMedium: attribution.utm_medium,
         utmCampaign: attribution.utm_campaign,
         utmContent: attribution.utm_content,
         utmTerm: attribution.utm_term,
-        clickId: attribution.gclid || attribution.fbclid || attribution.ttclid,
+        clickId: attribution.gclid || attribution.fbclid || attribution.ttclid, // Retained for ad-tracking attribution in case TikTok clicks are routed via custom campaigns
         landingUrl: attribution.landingUrl,
         referrer: attribution.referrer,
       };
@@ -409,11 +253,11 @@ export default function Home() {
             />
           </Link>
 
-          <nav className="nav-links" aria-label="Main navigation">
-            <a href="#services">Services</a>
-            <a href="#process">Process</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#faq">FAQ</a>
+          <nav className="nav-links nav-pills" aria-label="Main navigation">
+            <a href="#services" className={activeSection === "services" ? "active" : ""}>Services</a>
+            <a href="#process" className={activeSection === "process" ? "active" : ""}>Process</a>
+            <a href="#pricing" className={activeSection === "pricing" ? "active" : ""}>Pricing</a>
+            <a href="#faq" className={activeSection === "faq" ? "active" : ""}>FAQ</a>
           </nav>
 
           {WHATSAPP_NUMBER ? (
@@ -431,6 +275,10 @@ export default function Home() {
       </header>
 
       <section className="hero-section">
+        <div className="hero-shapes" aria-hidden="true">
+          <div className="shape shape-1" />
+          <div className="shape shape-2" />
+        </div>
         <div className="hero-map" aria-hidden="true">
           <Image
             src="/hero-map.webp"
@@ -444,36 +292,22 @@ export default function Home() {
 
         <div className="container hero-grid">
           <div className="hero-copy">
-            <div className="eyebrow">Paid ads · Pakistan</div>
+            <div className="eyebrow" data-reveal>{content.hero.eyebrow}</div>
 
-            <div
-              className="hero-chips"
-              role="tablist"
-              aria-label="Business audience selector"
-            >
-              {(
-                Object.keys(audienceContent) as Array<
-                  keyof typeof audienceContent
-                >
-              ).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={key === audience ? "chip active" : "chip"}
-                  role="tab"
-                  aria-selected={key === audience}
-                  onClick={() => selectAudience(key)}
-                >
-                  {audienceContent[key].label}
-                </button>
+            <h1 data-reveal data-reveal-delay="100">{content.hero.headline}</h1>
+
+            <p className="hero-subline" data-reveal data-reveal-delay="200">{content.hero.subline}</p>
+
+            <ul className="hero-checklist" data-reveal data-reveal-delay="300">
+              {content.hero.checklist.map((item) => (
+                <li key={item}>
+                  <Check size={18} />
+                  <span>{item}</span>
+                </li>
               ))}
-            </div>
+            </ul>
 
-            <h1>{audienceDetails.headline}</h1>
-
-            <p className="hero-subline">{audienceDetails.sub}</p>
-
-            <div className="cta-stack">
+            <div className="cta-stack" data-reveal data-reveal-delay="400">
               {WHATSAPP_NUMBER ? (
                 <a
                   className="whatsapp-button full-width"
@@ -486,17 +320,12 @@ export default function Home() {
                 </a>
               ) : null}
               <span className="reply-line">
-                Replies within 15 minutes, 10am–8pm
+                {content.hero.whatsappReplyText}
               </span>
-            </div>
-
-            <div className="proof-row">
-              <Check size={18} />
-              <span>{audienceDetails.proof}</span>
             </div>
           </div>
 
-          <aside id="audit" className="audit-card">
+          <aside id="audit" className="audit-card" data-reveal data-reveal-delay="500">
             <div className="audit-card-inner">
               {isSent ? (
                 <>
@@ -577,23 +406,37 @@ export default function Home() {
                   </label>
 
                   <label className="field-block">
-                    <span>Business type</span>
+                    <span>What kind of business do you have?</span>
                     <select
                       name="businessType"
                       value={form.businessType}
                       onChange={handleFieldChange("businessType")}
                     >
-                      <option value="" disabled>
-                        Select one
-                      </option>
-                      <option>Clinic</option>
-                      <option>Visa consultancy</option>
-                      <option>Local business</option>
+                      <option value="" disabled>Select one</option>
+                      <option>E-commerce</option>
+                      <option>Clinic / Healthcare</option>
+                      <option>Real Estate / Travel / Visa</option>
+                      <option>B2B / Agency</option>
+                      <option>Other</option>
                     </select>
                     {errors.businessType ? (
                       <small>{errors.businessType}</small>
                     ) : null}
                   </label>
+
+                  {form.businessType === "Other" && (
+                    <label className="field-block slide-down">
+                      <span>Please specify</span>
+                      <input
+                        type="text"
+                        name="businessTypeOther"
+                        value={form.businessTypeOther}
+                        onChange={handleFieldChange("businessTypeOther")}
+                        placeholder="e.g. Software house"
+                        maxLength={80}
+                      />
+                    </label>
+                  )}
 
                   <label className="field-block">
                     <span>City</span>
@@ -659,17 +502,16 @@ export default function Home() {
       <section id="services" className="page-section surface-section">
         <div className="container">
           <div className="section-heading-block">
-            <div className="eyebrow">What we run</div>
-            <h2>Ads that bring enquiries, not just clicks.</h2>
-            <p className="section-lead">
-              We plan, launch and manage your campaigns end to end, then report
-              in plain language every week.
+            <div className="eyebrow" data-reveal>{content.services.eyebrow}</div>
+            <h2 data-reveal data-reveal-delay="100">{content.services.headline}</h2>
+            <p className="section-lead" data-reveal data-reveal-delay="200">
+              {content.services.subline}
             </p>
           </div>
 
           <div className="card-grid four-up">
-            {services.map(({ title, description, icon: Icon }) => (
-              <article key={title} className="content-card service-card">
+            {content.services.items.map(({ title, description, icon: Icon }, i) => (
+              <article key={title} className="content-card service-card" data-reveal data-reveal-delay={300 + i * 100}>
                 <div className="icon-wrap">
                   <Icon size={18} />
                 </div>
@@ -684,13 +526,13 @@ export default function Home() {
       <section id="process" className="page-section paper-section">
         <div className="container">
           <div className="section-heading-block">
-            <div className="eyebrow">How it works</div>
-            <h2>From first message to live ads in about a week</h2>
+            <div className="eyebrow" data-reveal>{content.process.eyebrow}</div>
+            <h2 data-reveal data-reveal-delay="100">{content.process.headline}</h2>
           </div>
 
-          <div className="card-grid four-up">
-            {processSteps.map(({ step, title, body }) => (
-              <article key={step} className="content-card process-card">
+          <div className="process-timeline">
+            {content.process.steps.map(({ step, title, body }, i) => (
+              <article key={step} className="content-card process-card" data-reveal data-reveal-delay={200 + i * 100}>
                 <div className="step-label">{step}</div>
                 <h3>{title}</h3>
                 <p>{body}</p>
@@ -700,57 +542,64 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="stats-band">
-        <div className="container stats-grid">
-          {stats.map(({ value, label }) => (
-            <div key={label} className="stat-item">
-              <div className="stat-value">{value}</div>
-              <div className="stat-label">{label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="page-section paper-section">
-        <div className="container">
-          <div className="section-heading-block narrow">
-            <div className="eyebrow">Clients</div>
-            <h2>What our clients say</h2>
-          </div>
-
-          <div className="testimonial-grid">
-            {testimonials.map(({ quote, name, role, business, city }) => (
-              <blockquote key={quote} className="testimonial-box">
-                <p>“{quote}”</p>
-                <footer>
-                  <strong>{name}</strong>
-                  <span>{role}</span>
-                  <span>
-                    {business}, {city}
-                  </span>
-                </footer>
-              </blockquote>
+      {stats.length > 0 && (
+        <section className="stats-band">
+          <div className="container stats-grid">
+            {stats.map(({ value, label }, i) => (
+              <div key={label} className="stat-item" data-reveal data-reveal-delay={i * 100}>
+                <div className="stat-value">
+                  <CountUp end={value} enableScrollSpy scrollSpyOnce />
+                </div>
+                <div className="stat-label">{label}</div>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {testimonials.length > 0 && (
+        <section className="page-section paper-section">
+          <div className="container">
+            <div className="section-heading-block narrow">
+              <div className="eyebrow" data-reveal>Clients</div>
+              <h2 data-reveal data-reveal-delay="100">What our clients say</h2>
+            </div>
+
+            <div className="testimonial-grid">
+              {testimonials.map(({ quote, name, role, business, city }, i) => (
+                <blockquote key={quote} className="testimonial-box" data-reveal data-reveal-delay={200 + i * 100}>
+                  <p>“{quote}”</p>
+                  <footer>
+                    <strong>{name}</strong>
+                    <span>{role}</span>
+                    <span>
+                      {business}, {city}
+                    </span>
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section id="pricing" className="page-section surface-section">
         <div className="container">
           <div className="section-heading-block narrow">
-            <div className="eyebrow">Pricing</div>
-            <h2>One monthly fee. Ad spend stays yours.</h2>
-            <p className="section-lead">
-              You pay the platforms directly for ad spend, so you always see
-              exactly where your money goes.
+            <div className="eyebrow" data-reveal>{content.pricing.eyebrow}</div>
+            <h2 data-reveal data-reveal-delay="100">{content.pricing.headline}</h2>
+            <p className="section-lead" data-reveal data-reveal-delay="200">
+              {content.pricing.subline}
             </p>
           </div>
 
           <div className="pricing-grid">
-            {pricing.map(({ name, price, description, features }) => (
-              <article key={name} className="pricing-card">
+            {content.pricing.plans.map(({ name, price, description, features }, i) => (
+              <article key={name} className="pricing-card" data-reveal data-reveal-delay={300 + i * 100}>
                 <div className="plan-name">{name}</div>
-                <div className="plan-price">{price}</div>
+                <div className="plan-price">
+                  {price.includes("___") || !price.trim() ? "Custom quote" : price}
+                </div>
                 <p>{description}</p>
                 <ul>
                   {features.map((feature) => (
@@ -769,32 +618,32 @@ export default function Home() {
       <section id="faq" className="page-section paper-section">
         <div className="container faq-wrap">
           <div className="section-heading-block narrow">
-            <div className="eyebrow">FAQ</div>
-            <h2>Questions we hear most</h2>
+            <div className="eyebrow" data-reveal>{content.faqs.eyebrow}</div>
+            <h2 data-reveal data-reveal-delay="100">{content.faqs.headline}</h2>
           </div>
 
           <div className="faq-list">
-            {faqs.map(({ question, answer }) => (
-              <details key={question} className="faq-item">
-                <summary>{question}</summary>
-                <p>{answer}</p>
+            {content.faqs.items.map(({ question, answer }, i) => (
+              <details key={question} className="faq-item" data-reveal data-reveal-delay={200 + i * 50}>
+                <summary>
+                  {question}
+                  <div className="faq-icon"><Check size={18} /></div>
+                </summary>
+                <div className="faq-answer">
+                  <p>{answer}</p>
+                </div>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="page-section final-cta-wrap">
+      <section className="page-section final-cta-wrap" data-reveal>
         <div className="container">
           <div className="final-cta">
             <div className="final-cta-copy">
-              <h2>
-                Tell us what you sell. We will show you where the leads are.
-              </h2>
-              <p>
-                Free audit of your current ads, or a first-campaign plan if you
-                are starting out.
-              </p>
+              <h2>{content.finalCta.headline}</h2>
+              <p>{content.finalCta.subline}</p>
             </div>
             <div className="final-cta-actions">
               {WHATSAPP_NUMBER ? (
@@ -808,16 +657,8 @@ export default function Home() {
                   Chat on WhatsApp
                 </a>
               ) : null}
-              <a className="secondary-button full-width" href="#audit">
-                Get a free ad audit
-              </a>
-              <a
-                className="tertiary-link"
-                href="https://cal.com/adsboosters"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Book a 15-min call
+              <a href="#audit" className="secondary-button full-width">
+                Send an enquiry
               </a>
             </div>
           </div>
@@ -827,115 +668,25 @@ export default function Home() {
       <footer className="site-footer">
         <div className="container footer-inner">
           <div className="footer-main">
-            <div
-              className="footer-brand"
-              aria-label="AdsBoosters.pk footer logo"
-            >
+            <div className="footer-brand">
               <Image
-                src="/logo.webp"
+                src="/icon1.png"
                 alt="AdsBoosters.pk"
-                width={88}
-                height={88}
+                width={72}
+                height={72}
                 className="footer-logo-image"
               />
               <div>
                 <strong>AdsBoosters.pk</strong>
-                <p>Performance ads for businesses ready to grow.</p>
+                <p>{content.footer.tagline}</p>
               </div>
             </div>
-
-            <div className="footer-column">
-              <h3>
-                <Compass size={15} /> Explore
-              </h3>
-              <a href="#services">Services</a>
-              <a href="#process">Process</a>
-              <a href="#pricing">Pricing</a>
-              <a href="#faq">FAQ</a>
-            </div>
-
-            <div className="footer-column">
-              <h3>
-                <Mail size={15} /> Contact
-              </h3>
-              <a href="mailto:adsboosters6030@gmail.com">
-                <Mail size={15} /> Email us
-              </a>
-              {WHATSAPP_NUMBER ? (
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Chat on WhatsApp
-                </a>
-              ) : null}
-              <span>
-                <MapPin size={15} /> Pakistan · Serving nationwide
-              </span>
-            </div>
-
-            <div className="footer-column">
-              <h3>
-                <ShieldCheck size={15} /> Legal
-              </h3>
-              <a href="/privacy">
-                <ShieldCheck size={15} /> Privacy policy
-              </a>
-              <a href="/terms">Terms of service</a>
-            </div>
-
-            <div className="footer-column">
-              <h3>
-                <ExternalLink size={15} /> Follow
-              </h3>
-              <a
-                href="https://www.facebook.com/profile.php?id=61593563594054"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink size={15} /> Facebook
-              </a>
-              <a
-                href="https://www.instagram.com/adsboosters.pk"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink size={15} /> Instagram
-              </a>
-            </div>
           </div>
-
           <div className="footer-meta">
-            <div className="copyright">© 2026 AdsBoosters.pk</div>
-            <div className="footer-platforms">Google · Meta · TikTok</div>
-            <div className="footer-credit">
-              Designed and developed by{" "}
-              <a
-                href="https://deepdevsolutions.com"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Deep Dev Solutions <ExternalLink size={13} />
-              </a>
-            </div>
+            <span className="copyright">{content.footer.copyright}</span>
           </div>
         </div>
       </footer>
-
-      {WHATSAPP_NUMBER ? (
-        <div className="mobile-sticky-cta">
-          <a
-            className="whatsapp-button full-width"
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MessageSquareText size={18} />
-            Chat on WhatsApp
-          </a>
-        </div>
-      ) : null}
     </main>
   );
 }

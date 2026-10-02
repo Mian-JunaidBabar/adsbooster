@@ -2,9 +2,11 @@ import { z } from "zod";
 import { normalizePhone } from "./utils/phone";
 
 export const businessTypes = [
-  "Clinic",
-  "Visa consultancy",
-  "Local business",
+  "E-commerce",
+  "Clinic / Healthcare",
+  "Real Estate / Travel / Visa",
+  "B2B / Agency",
+  "Other",
 ] as const;
 
 export const budgetOptions = [
@@ -40,7 +42,7 @@ export const leadSchema = z.object({
     })
     .pipe(z.string().regex(/^\+923\d{9}$/)),
   budget: z.enum(budgetOptions),
-  audience: z.enum(["clinic", "visa", "other"]).optional(),
+  businessTypeOther: z.string().trim().max(80).optional(),
   utmSource: z.string().trim().max(255).optional(),
   utmMedium: z.string().trim().max(255).optional(),
   utmCampaign: z.string().trim().max(255).optional(),

@@ -109,11 +109,12 @@ export async function POST(request: NextRequest) {
         createdAt,
         name: parsed.name,
         email: parsed.email,
-        businessType: parsed.businessType,
+        businessType: parsed.businessType === "Other" && parsed.businessTypeOther 
+          ? `Other: ${parsed.businessTypeOther}` 
+          : parsed.businessType,
         city: parsed.city,
         phone: parsed.phone,
         budget: parsed.budget,
-        audience: parsed.audience,
         utmSource: parsed.utmSource,
         utmMedium: parsed.utmMedium,
         utmCampaign: parsed.utmCampaign,
