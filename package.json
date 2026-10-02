@@ -7,7 +7,7 @@
     "build": "next build",
     "build:e2e": "NEXT_PUBLIC_WHATSAPP_NUMBER=923000000000 NEXT_PUBLIC_SITE_URL=http://localhost:3000 GOOGLE_SHEETS_WEBHOOK_URL=http://127.0.0.1:4000/exec GOOGLE_SHEETS_WEBHOOK_SECRET=testsecret12345678 PLAYWRIGHT_TEST=true npm run build",
     "start": "next start",
-    "lint": "eslint app lib next.config.ts",
+    "lint": "eslint app components lib next.config.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,14 +15,12 @@
     "db:migrate": "supabase db push"
   },
   "dependencies": {
-    "@calcom/embed-react": "^1.5.3",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
     "clsx": "^2.1.1",
     "lucide-react": "^1.49.0",
     "next": "^16.3.8",
     "react": "^19.3.0",
-    "react-countup": "^6.5.3",
     "react-dom": "^19.3.0",
     "resend": "^6.32.0",
     "zod": "^4.6.5"
@@ -33,7 +31,6 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
-    "@types/react-countup": "^4.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^9.39.5",
