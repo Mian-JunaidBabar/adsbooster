@@ -16,4 +16,5 @@ export const budgetOptions = [
   "50k–150k PKR",
   "150k–500k PKR",
   "500k+ PKR",
+  "Not sure yet",
 ] as const;

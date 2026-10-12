@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         id: leadId,
         createdAt,
         name: parsed.name,
-        email: parsed.email,
+        email: parsed.email ?? "",
         businessType,
         city: parsed.city,
         phone: parsed.phone,
@@ -170,8 +170,12 @@ export async function POST(request: NextRequest) {
         }),
       ];
 
-      // Confirmation email only when it can work (not onboarding@resend.dev)
-      if (!env.RESEND_FROM_EMAIL.includes("onboarding@resend.dev")) {
+      // Confirmation email only when the lead gave an address and sending can
+      // work (not onboarding@resend.dev)
+      if (
+        parsed.email &&
+        !env.RESEND_FROM_EMAIL.includes("onboarding@resend.dev")
+      ) {
         emailPromises.push(
           resend.emails.send({
             from: env.RESEND_FROM_EMAIL,
@@ -241,7 +245,7 @@ function buildLeadConfirmationEmail(name: string) {
 function buildNotificationEmail(
   lead: {
     name: string;
-    email: string;
+    email?: string;
     businessType: string;
     city: string;
     phone: string;
@@ -251,7 +255,7 @@ function buildNotificationEmail(
 ) {
   const rows = [
     ["Name", lead.name],
-    ["Email", lead.email],
+    ["Email", lead.email ?? "Not given"],
     ["Business type", lead.businessType],
     ["City", lead.city],
     ["WhatsApp", lead.phone],

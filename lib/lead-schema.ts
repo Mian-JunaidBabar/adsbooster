@@ -7,12 +7,14 @@ export { budgetOptions, businessTypes };
 export const leadSchema = z
   .object({
     name: z.string().trim().min(2, "Name is required").max(80),
-    email: z
-      .string()
-      .trim()
-      .email("Enter a valid email address")
-      .max(160)
-      .transform((value) => value.toLowerCase()),
+    // Optional: a blank value becomes undefined, anything else must be an email.
+    email: z.preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.trim().toLowerCase() || undefined
+          : value,
+      z.string().email("Enter a valid email address").max(160).optional(),
+    ),
     businessType: z.enum(businessTypes),
     city: z.string().trim().min(2, "City is required").max(60),
     phone: z

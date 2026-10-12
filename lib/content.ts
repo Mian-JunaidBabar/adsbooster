@@ -30,6 +30,15 @@ export type ServiceItem = {
   accent: "blue" | "cyan" | "navy";
   /** When set, the whole card becomes a link. */
   href?: string;
+  /** Link text at the bottom of the card. Defaults to "Learn more". */
+  cue?: string;
+};
+
+export type FaqEntry = {
+  question: string;
+  answer: string;
+  /** Optional link appended to the answer, e.g. to a section on the page. */
+  link?: { href: string; label: string };
 };
 
 /**
@@ -38,10 +47,12 @@ export type ServiceItem = {
  */
 export const content = {
   nav: [
+    { id: "results", label: "Results" },
     { id: "services", label: "Services" },
     { id: "process", label: "Process" },
     { id: "pricing", label: "Pricing" },
     { id: "faq", label: "FAQ" },
+    { id: "audit", label: "Free audit" },
   ],
   hero: {
     eyebrow: "PERFORMANCE ADS · GOOGLE · META · SOCIAL MEDIA",
@@ -56,6 +67,54 @@ export const content = {
     whatsappPrefill:
       "Assalam o Alaikum, mujhe apne business ke liye ads aur social media se zyada leads chahiye.",
     whatsappReplyText: "Replies within 15 minutes, 10am–8pm",
+    proofLine: "123K views in 28 days for SS Traders, Lahore",
+  },
+  /** Client proof. Bracketed values are placeholders and stay hidden until filled. */
+  results: {
+    eyebrow: "Results",
+    headline: "A Lahore foundry supplier reached 42,000 new people in 28 days.",
+    subline:
+      "SS Traders sells ferro alloys and foundry chemicals, a market most agencies won't touch.",
+    workLine: "[One line on what AdsBoosters did for SS Traders]",
+    stats: [
+      { value: 123, suffix: "K", label: "views on Facebook in 28 days" },
+      {
+        value: 99,
+        suffix: "%",
+        label: "of views from people who didn't follow the page yet",
+      },
+      { value: 71, label: "visitors from Google search in the same month" },
+    ] as ProofStat[],
+    banner: {
+      src: "/results/ss-traders-banner.webp",
+      alt: "SS Traders, foundry and furnace chemicals supplier in Lahore",
+      width: 640,
+      height: 435,
+    },
+    screenshots: [
+      {
+        src: "/results/ss-traders-meta-insights.webp",
+        alt: "Meta insights showing 123.2K views and 42,208 viewers for SS Traders in 28 days",
+        caption: "Facebook reach, Meta Business Suite, 14 Sep to 11 Oct 2026",
+        width: 492,
+        height: 322,
+      },
+      {
+        src: "/results/ss-traders-search-console.webp",
+        alt: "Google Search Console showing 71 clicks and 1.05K impressions for sstraders.pk",
+        caption: "Google Search Console, last 28 days",
+        width: 1190,
+        height: 410,
+      },
+    ],
+    quote: {
+      text: "[One or two lines from the SS Traders owner.]",
+      name: "[Owner name]",
+      business: "SS Traders, Lahore",
+    },
+    ctaLabel: "Get results like this",
+    whatsappPrefill:
+      "Assalam o Alaikum, I saw the SS Traders results and want the same for my business.",
   },
   services: {
     eyebrow: "What we run",
@@ -78,16 +137,15 @@ export const content = {
         accent: "cyan",
       },
       {
-        title: "Google Page Ranking",
+        title: "SEO and Google Maps ranking",
         description:
-          "Get your business showing higher on Google Search and Maps.",
+          "Get your business showing higher on Google Search and Google Maps.",
         icon: TrendingUp,
-        accent: "navy",
-        // The client will send a URL. Until then this opens WhatsApp; replace
-        // the value on this one line to change where the card goes.
+        accent: "cyan",
         href: whatsappLink(
           "Assalam o Alaikum, mujhe apna business Google par upar rank karwana hai.",
         ),
+        cue: "Ask on WhatsApp",
       },
       {
         title: "Social media management",
@@ -138,8 +196,9 @@ export const content = {
     plans: [
       {
         name: "Ads management",
-        // Leave empty until the owner sets a price: the card shows "Custom quote".
-        price: "",
+        // Amount in PKR, e.g. "40,000". Empty or [bracketed] shows "Custom quote";
+        // a real amount shows "Starting from 40,000 PKR a month".
+        price: "[amount]",
         description: "+ ad spend, paid directly to the platform",
         features: [
           "Google and Meta campaigns",
@@ -150,7 +209,7 @@ export const content = {
       },
       {
         name: "Social media management",
-        price: "",
+        price: "[amount]",
         description: "Ad spend not included",
         features: [
           "Monthly content calendar",
@@ -192,24 +251,35 @@ export const content = {
       },
       {
         question: "Is there a long contract?",
-        answer:
-          "No. We work month to month. You own your ad accounts, pages and data.",
+        answer: "No. We work month to month.",
       },
-    ],
+      {
+        question: "Can I see results from other clients?",
+        answer: "Yes, see",
+        link: { href: "#results", label: "SS Traders above" },
+      },
+    ] as FaqEntry[],
   },
-  finalCta: {
-    headline: "Tell us what you sell. We will show you where the leads are.",
+  audit: {
+    headline: "Tell us what you sell. We'll show you where the leads are.",
     subline:
-      "Free audit of your current ads, or a first-campaign plan if you are starting out.",
+      "Free audit of your current ads, or a first campaign plan if you're starting out. We reply on WhatsApp within 15 minutes, 10am to 8pm.",
+    chatLine: "Rather just chat? Message us on WhatsApp",
   },
   footer: {
     tagline: "Performance marketing for Pakistani businesses.",
     copyright: "© 2026 AdsBoosters.pk",
     platforms: "Google · Meta",
+    // The one contact email for the whole site, legal pages included.
+    // Awaiting the client's confirmation of the final address.
     email: "adsboosters6030@gmail.com",
+    phone: { label: "+92 345 5058317", href: "tel:+923455058317" },
+    // Shown once the client sends it; a [bracketed] value stays hidden.
+    address: "[Lahore address]",
     social: [
       {
         label: "Facebook",
+        // TODO: swap for the page's clean URL (facebook.com/<name>) once the client sends it.
         href: "https://www.facebook.com/profile.php?id=61593563594054",
       },
       { label: "Instagram", href: "https://www.instagram.com/adsboosters.pk" },

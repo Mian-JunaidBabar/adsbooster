@@ -1,9 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { content } from "../../lib/content";
+
+const title = "Terms of Service | AdsBoosters.pk";
+const description = "Terms for using AdsBoosters.pk services and website.";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | AdsBoosters.pk",
-  description: "Terms for using AdsBoosters.pk services and website.",
+  title,
+  description,
+  // Each legal page is its own canonical, not the homepage.
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    type: "website",
+    locale: "en_PK",
+    siteName: "AdsBoosters.pk",
+    url: "/terms",
+    title,
+    description,
+    // A page-level openGraph replaces the root one, so the image is re-listed.
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function TermsPage() {
@@ -74,9 +90,7 @@ export default function TermsPage() {
           <h2>Contact</h2>
           <p>
             Questions about these terms can be sent to{" "}
-            <a href="mailto:adsboosters6030@gmail.com">
-              adsboosters6030@gmail.com
-            </a>
+            <a href={`mailto:${content.footer.email}`}>{content.footer.email}</a>
             .
           </p>
         </section>
