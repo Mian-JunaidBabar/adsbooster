@@ -10,7 +10,7 @@ type NavPillsProps = {
 /**
  * Section pills for the sticky header. The pill for the section crossing the
  * middle of the screen is active (one IntersectionObserver, no scroll
- * listeners). Below 860px the pills collapse into a menu button.
+ * listeners). Below 1080px the pills collapse into a menu button.
  */
 export default function NavPills({ items }: NavPillsProps) {
   const [active, setActive] = useState("");

@@ -8,6 +8,7 @@ const CLOSE_MS = 250;
 type FaqItemProps = {
   question: string;
   answer: string;
+  link?: { href: string; label: string };
   index: number;
 };
 
@@ -17,7 +18,12 @@ type FaqItemProps = {
  * `data-open="false"` holds the answer at 0fr while `open` is set or about to
  * be removed, which is what lets the 0fr to 1fr transition run both ways.
  */
-export default function FaqItem({ question, answer, index }: FaqItemProps) {
+export default function FaqItem({
+  question,
+  answer,
+  link,
+  index,
+}: FaqItemProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const frame = useRef<number | undefined>(undefined);
@@ -74,7 +80,18 @@ export default function FaqItem({ question, answer, index }: FaqItemProps) {
       </summary>
       <div className="faq-answer">
         <div>
-          <p>{answer}</p>
+          <p>
+            {answer}
+            {link ? (
+              <>
+                {" "}
+                <a href={link.href} className="faq-link">
+                  {link.label}
+                </a>
+                .
+              </>
+            ) : null}
+          </p>
         </div>
       </div>
     </details>

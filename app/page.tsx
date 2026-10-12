@@ -8,7 +8,9 @@ import {
   Mail,
   MapPin,
   MessageSquareText,
+  Phone,
   ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
 import type { CSSProperties } from "react";
 import CountUp from "../components/CountUp";
@@ -16,7 +18,9 @@ import FaqItem from "../components/FaqItem";
 import LeadForm from "../components/LeadForm";
 import MotionController from "../components/MotionController";
 import NavPills from "../components/NavPills";
+import ResultShots from "../components/ResultShots";
 import StickyWhatsApp from "../components/StickyWhatsApp";
+import WhatsAppTracking from "../components/WhatsAppTracking";
 import {
   content,
   getCompleteStats,
@@ -45,6 +49,7 @@ function ServiceCard({
   icon: Icon,
   accent,
   href,
+  cue = "Learn more",
   index,
 }: ServiceCardProps) {
   const inner = (
@@ -69,7 +74,7 @@ function ServiceCard({
     >
       {inner}
       <span className="card-cue">
-        Learn more <ArrowRight size={16} aria-hidden="true" />
+        {cue} <ArrowRight size={16} aria-hidden="true" />
       </span>
     </a>
   );
@@ -83,10 +88,16 @@ export default function Home() {
   const stats = getCompleteStats(content.stats);
   const testimonials = getCompleteTestimonials(content.testimonials);
   const quoteHref = whatsappLink(content.pricing.quotePrefill);
+  const { results } = content;
+  const resultsHref = whatsappLink(results.whatsappPrefill);
+  const hasQuote =
+    !isPlaceholder(results.quote.text) && !isPlaceholder(results.quote.name);
+  const { address } = content.footer;
 
   return (
     <main className="adsbooster-page">
       <MotionController />
+      <WhatsAppTracking />
 
       <header className="site-header">
         <div className="container header-inner">
@@ -121,15 +132,15 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="hero-section" data-hero>
+      <section id="hero" className="hero-section" data-hero>
         <div className="hero-shapes" aria-hidden="true" data-pause-offscreen>
           <div className="shape shape-1" />
           <div className="shape shape-2" />
         </div>
-        <div className="hero-map" aria-hidden="true">
+        <div className="hero-map">
           <Image
             src="/hero-map.webp"
-            alt=""
+            alt="World map outline"
             fill
             priority
             sizes="100vw"
@@ -176,16 +187,84 @@ export default function Home() {
               <span className="reply-line">
                 {content.hero.whatsappReplyText}
               </span>
+              <a href="#results" className="hero-proof">
+                <TrendingUp size={16} aria-hidden="true" />
+                <span>{content.hero.proofLine}</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
             </div>
           </div>
-
-          <aside id="audit" className="audit-card">
-            <LeadForm whatsappHref={whatsappHref} />
-          </aside>
         </div>
       </section>
 
-      <section id="services" className="page-section surface-section">
+      <section id="results" className="page-section surface-section">
+        <div className="container">
+          <div className="results-intro">
+            <div className="section-heading-block" {...reveal()}>
+              <div className="eyebrow">{results.eyebrow}</div>
+              <h2>{results.headline}</h2>
+              <p className="section-lead">
+                {results.subline}
+                {isPlaceholder(results.workLine) ? null : (
+                  <> {results.workLine}</>
+                )}
+              </p>
+            </div>
+            <div className="results-banner" {...reveal(1)}>
+              <Image
+                src={results.banner.src}
+                alt={results.banner.alt}
+                width={results.banner.width}
+                height={results.banner.height}
+                sizes="(max-width: 1024px) 100vw, 480px"
+              />
+            </div>
+          </div>
+
+          <div className="results-stats">
+            {results.stats.map(({ value, prefix, suffix, label }, i) => (
+              <div
+                key={label}
+                className="result-stat"
+                data-count-scope
+                {...reveal(i)}
+              >
+                <div className="result-stat-value">
+                  <CountUp value={value} prefix={prefix} suffix={suffix} />
+                </div>
+                <p>{label}</p>
+              </div>
+            ))}
+          </div>
+
+          <ResultShots shots={results.screenshots} />
+
+          <div className="results-close" {...reveal()}>
+            {hasQuote ? (
+              <blockquote className="results-quote">
+                <p>{results.quote.text}</p>
+                <footer>
+                  <strong>{results.quote.name}</strong>
+                  <span>{results.quote.business}</span>
+                </footer>
+              </blockquote>
+            ) : null}
+            {resultsHref ? (
+              <a
+                className="whatsapp-button"
+                href={resultsHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <WhatsAppIcon />
+                {results.ctaLabel}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="page-section paper-section">
         <div className="container">
           <div className="section-heading-block" {...reveal()}>
             <div className="eyebrow">{content.services.eyebrow}</div>
@@ -201,7 +280,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="process" className="page-section paper-section">
+      <section id="process" className="page-section surface-section">
         <div className="container">
           <div className="section-heading-block" {...reveal()}>
             <div className="eyebrow">{content.process.eyebrow}</div>
@@ -265,7 +344,7 @@ export default function Home() {
         </section>
       ) : null}
 
-      <section id="pricing" className="page-section surface-section">
+      <section id="pricing" className="page-section paper-section">
         <div className="container">
           <div className="section-heading-block narrow" {...reveal()}>
             <div className="eyebrow">{content.pricing.eyebrow}</div>
@@ -282,7 +361,15 @@ export default function Home() {
                   <article key={name} className="pricing-card" {...reveal(i)}>
                     <div className="plan-name">{name}</div>
                     <div className="plan-price">
-                      {hasPrice ? price : "Custom quote"}
+                      {hasPrice ? (
+                        <>
+                          <small>Starting from</small>
+                          {price} PKR
+                          <small>a month</small>
+                        </>
+                      ) : (
+                        "Custom quote"
+                      )}
                     </div>
                     <p>{description}</p>
                     <ul>
@@ -313,7 +400,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faq" className="page-section paper-section">
+      <section id="faq" className="page-section surface-section">
         <div className="container faq-wrap">
           <div className="section-heading-block narrow" {...reveal()}>
             <div className="eyebrow">{content.faqs.eyebrow}</div>
@@ -321,11 +408,12 @@ export default function Home() {
           </div>
 
           <div className="faq-list">
-            {content.faqs.items.map(({ question, answer }, i) => (
+            {content.faqs.items.map(({ question, answer, link }, i) => (
               <FaqItem
                 key={question}
                 question={question}
                 answer={answer}
+                link={link}
                 index={i}
               />
             ))}
@@ -333,15 +421,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="page-section final-cta-wrap">
+      <section id="audit" className="page-section audit-section">
         <div className="container">
-          <div className="final-cta" data-pause-offscreen {...reveal()}>
-            <div className="final-cta-copy">
-              <h2>{content.finalCta.headline}</h2>
-              <p>{content.finalCta.subline}</p>
+          <div className="final-cta" data-pause-offscreen>
+            <div className="final-cta-copy" {...reveal()}>
+              <h2>{content.audit.headline}</h2>
+              <p>{content.audit.subline}</p>
             </div>
-            <div className="final-cta-actions">
-              {hasWhatsApp ? (
+            <div className="audit-card">
+              <LeadForm whatsappHref={whatsappHref} />
+            </div>
+            {hasWhatsApp ? (
+              <div className="audit-chat" {...reveal(1)}>
+                <p>{content.audit.chatLine}</p>
                 <a
                   className="whatsapp-button full-width"
                   href={whatsappHref}
@@ -351,11 +443,8 @@ export default function Home() {
                   <WhatsAppIcon />
                   Chat on WhatsApp
                 </a>
-              ) : null}
-              <a href="#audit" className="secondary-button full-width">
-                Get a free ad audit
-              </a>
-            </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
@@ -393,6 +482,13 @@ export default function Home() {
                 <Mail size={15} aria-hidden="true" /> Contact
               </h3>
               <a
+                href={content.footer.phone.href}
+                className="link-underline"
+              >
+                <Phone size={15} aria-hidden="true" />
+                {content.footer.phone.label}
+              </a>
+              <a
                 href={`mailto:${content.footer.email}`}
                 className="link-underline"
               >
@@ -409,8 +505,10 @@ export default function Home() {
                 </a>
               ) : null}
               <span>
-                <MapPin size={15} aria-hidden="true" /> Pakistan · Serving
-                nationwide
+                <MapPin size={15} aria-hidden="true" />
+                {isPlaceholder(address)
+                  ? "Pakistan · Serving nationwide"
+                  : address}
               </span>
             </div>
 

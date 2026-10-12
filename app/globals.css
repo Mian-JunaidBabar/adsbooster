@@ -333,6 +333,25 @@ img {
   font-weight: 500;
 }
 
+/* One proof line under the hero button, pointing at #results */
+.hero-proof {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 4px;
+  color: var(--blue);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.hero-proof svg {
+  flex-shrink: 0;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
 .hero-checklist {
   list-style: none;
   padding: 0;
@@ -353,13 +372,15 @@ img {
 }
 
 .audit-card {
-  max-width: 480px;
   width: 100%;
-  margin-left: auto;
-  background: var(--surface);
+  background: var(--paper);
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-raised);
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.audit-card:focus-within {
+  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
 }
 
 .audit-card-inner {
@@ -381,7 +402,6 @@ img {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.audit-card h2,
 .section-heading-block h2,
 .final-cta h2 {
   margin: 0;
@@ -452,6 +472,18 @@ img {
   font-size: 0.74rem;
   color: var(--danger);
   font-weight: 600;
+}
+
+.audit-success h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.audit-success p {
+  margin: 0;
+  color: var(--ink-soft);
 }
 
 .success-box {
@@ -541,18 +573,36 @@ img {
   display: block;
   overflow: hidden;
   padding: 27px 22px 24px;
+  background: var(--surface);
   --accent: var(--blue);
   --accent-ink: var(--blue);
+  --accent-on: #fff;
 }
 
 .service-card[data-accent="cyan"] {
   --accent: var(--cyan);
   --accent-ink: var(--navy);
+  --accent-on: var(--navy);
 }
 
 .service-card[data-accent="navy"] {
   --accent: var(--navy);
   --accent-ink: var(--navy);
+}
+
+/* Soft accent wash from the top corner, faded in on hover */
+.service-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 70% at 0% 0%,
+    color-mix(in srgb, var(--accent) 12%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
 }
 
 .service-card::before {
@@ -571,7 +621,10 @@ img {
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent) 16%, var(--surface));
   color: var(--accent-ink);
-  transition: transform var(--dur-base) var(--ease-out);
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
 }
 
 .content-card h3 {
@@ -597,6 +650,7 @@ img {
   color: var(--blue);
   font-weight: 700;
   font-size: 0.9375rem;
+  transition: color var(--dur-base) var(--ease-out);
 }
 
 .card-cue svg {
@@ -632,6 +686,9 @@ img {
   font-size: 0.9375rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
 }
 
 .process-step h3 {
@@ -747,10 +804,24 @@ img {
 }
 
 .pricing-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 18px;
   background: var(--surface);
   padding: 24px;
+}
+
+/* Accent bar that draws across the top on hover */
+.pricing-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--navy), var(--blue), var(--cyan));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-reveal) var(--ease-out);
 }
 
 .plan-name {
@@ -759,12 +830,22 @@ img {
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 600;
+  transition: color var(--dur-base) var(--ease-out);
 }
 
 .plan-price {
   font-size: clamp(2rem, 1.5rem + 1vw, 2.8rem);
   font-weight: 800;
   line-height: 1.05;
+}
+
+.plan-price small {
+  display: block;
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .pricing-card ul {
@@ -787,7 +868,16 @@ img {
 .faq-item {
   padding: 1rem 1.1rem;
   background: var(--paper);
-  transition: background-color var(--dur-base) var(--ease-out);
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.faq-link {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .faq-item summary {
@@ -840,18 +930,18 @@ img {
   transform: rotate(180deg);
 }
 
-.final-cta-wrap {
-  padding-top: 0;
+.audit-section {
+  background: var(--paper);
 }
 
+/* Free audit: copy, form and the WhatsApp alternative in one panel.
+   Mobile stacks copy, form, chat; desktop puts the chat beside the form. */
 .final-cta {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  display: grid;
+  gap: 28px;
   overflow: hidden;
-  padding: clamp(32px, 5vw, 56px);
+  padding: clamp(20px, 5vw, 56px);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -877,20 +967,281 @@ img {
 }
 
 .final-cta-copy {
-  flex: 1 1 380px;
   display: grid;
-  gap: 12px;
+  align-content: start;
+  gap: 16px;
 }
 
 .final-cta-copy p {
+  max-width: 46ch;
   margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.0625rem;
+}
+
+.audit-chat {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: var(--blue-tint);
+}
+
+.audit-chat p {
+  margin: 0;
+  font-weight: 700;
+}
+
+@media (min-width: 1025px) {
+  .final-cta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    grid-template-areas:
+      "copy form"
+      "chat form";
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(40px, 5vw, 72px);
+    row-gap: 32px;
+  }
+  .final-cta-copy {
+    grid-area: copy;
+  }
+  .final-cta .audit-card {
+    grid-area: form;
+  }
+  .audit-chat {
+    grid-area: chat;
+    align-self: start;
+    max-width: 420px;
+  }
+}
+
+/* Results: SS Traders proof */
+.results-intro {
+  display: grid;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.results-intro .section-heading-block {
+  margin-bottom: 0;
+}
+
+.results-banner {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-raised);
+}
+
+.results-banner img {
+  width: 100%;
+  height: auto;
+  transition: transform var(--dur-reveal) var(--ease-out);
+}
+
+@media (min-width: 1025px) {
+  .results-intro {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 56px;
+  }
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.result-stat {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+/* A short accent bar at rest that runs the full width on hover */
+.result-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transform: scaleX(0.18);
+  transform-origin: left;
+  transition: transform var(--dur-reveal) var(--ease-out);
+}
+
+.result-stat-value {
+  color: var(--navy);
+  font-size: clamp(2.5rem, 1.8rem + 2vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.result-stat p {
+  margin: 12px 0 0;
   color: var(--ink-soft);
 }
 
-.final-cta-actions {
-  flex: 0 1 360px;
+.result-shots {
   display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .result-shots {
+    grid-template-columns: var(--shot-cols);
+  }
+}
+
+.result-shot {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.result-shot figcaption {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.result-shot-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: zoom-in;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.result-shot-frame img {
+  width: 100%;
+  height: auto;
+  transition: transform var(--dur-reveal) var(--ease-out);
+}
+
+.result-shot-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--navy) 80%, transparent);
+  color: #fff;
+  transition: background-color var(--dur-base) var(--ease-out);
+}
+
+.results-close {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.results-quote {
+  flex: 1 1 420px;
+  margin: 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--blue);
+}
+
+.results-quote p {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.results-quote footer {
+  display: grid;
+  gap: 2px;
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+.results-quote strong {
+  color: var(--ink);
+}
+
+/* Full-size screenshot viewer (native <dialog>) */
+.lightbox {
+  /* Tailwind's reset zeroes dialog margins; auto re-centres the modal */
+  margin: auto;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.lightbox::backdrop {
+  background: rgb(10 30 54 / 0.85);
+}
+
+.lightbox figure {
+  display: grid;
+  justify-items: center;
   gap: 12px;
+  margin: 0;
+  padding-top: 56px;
+}
+
+/* Screenshots are small; enlarge to a readable size, never past the screen */
+.lightbox img {
+  width: min(900px, calc(100vw - 32px));
+  height: auto;
+  max-height: calc(100dvh - 150px);
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+
+.lightbox figcaption {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-out);
 }
 
 .site-footer {
@@ -1084,13 +1435,28 @@ img {
   .hero-grid {
     grid-template-columns: 1fr;
   }
-  .audit-card {
-    margin-left: 0;
+}
+
+/* Desktop: with the form gone the map fills the hero's right side */
+@media (min-width: 1025px) {
+  .hero-map {
+    mask-image: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.15) 0%,
+      rgba(0, 0, 0, 0.6) 45%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.15) 0%,
+      rgba(0, 0, 0, 0.6) 45%,
+      rgba(0, 0, 0, 1) 100%
+    );
   }
 }
 
 /* Pills collapse into a menu button when they no longer fit */
-@media (max-width: 859px) {
+@media (max-width: 1079px) {
   .nav-toggle {
     display: inline-flex;
     margin-left: auto;
@@ -1145,16 +1511,12 @@ img {
   .four-up,
   .pricing-grid,
   .testimonial-grid,
-  .stats-grid {
+  .stats-grid,
+  .results-stats {
     grid-template-columns: 1fr;
   }
-  .final-cta {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .final-cta-actions {
+  .results-close .whatsapp-button {
     width: 100%;
-    flex-basis: auto;
   }
   .footer-columns {
     display: grid;
@@ -1202,6 +1564,9 @@ img {
 @media (max-width: 390px) {
   .audit-card-inner {
     padding: 1.2rem 1rem;
+  }
+  .audit-chat {
+    padding: 16px;
   }
   .content-card,
   .pricing-card {
@@ -1292,9 +1657,61 @@ img {
   .service-card:focus-visible,
   .pricing-card:hover,
   .pricing-card:has(:focus-visible),
-  .testimonial-box:hover {
+  .testimonial-box:hover,
+  .result-stat:hover {
     border-color: var(--blue);
     box-shadow: var(--shadow-raised);
+  }
+
+  /* Services: the wash fades in and the icon badge fills with its accent */
+  .service-card:hover::after,
+  .service-card:focus-visible::after {
+    opacity: 1;
+  }
+
+  .service-card:hover .icon-wrap,
+  .service-card:focus-visible .icon-wrap {
+    background: var(--accent);
+    color: var(--accent-on);
+  }
+
+  .service-card:hover .card-cue,
+  .service-card:focus-visible .card-cue {
+    color: var(--navy);
+  }
+
+  .result-stat:hover {
+    background: var(--surface);
+  }
+
+  .result-stat:hover .result-stat-value {
+    color: var(--blue);
+  }
+
+  .result-shot-frame:hover,
+  .result-shot-frame:focus-visible {
+    border-color: var(--blue);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .result-shot-frame:hover .result-shot-zoom,
+  .result-shot-frame:focus-visible .result-shot-zoom {
+    background: var(--blue);
+  }
+
+  .pricing-card:hover .plan-name,
+  .pricing-card:has(:focus-visible) .plan-name {
+    color: var(--blue);
+  }
+
+  .lightbox-close:hover,
+  .lightbox-close:focus-visible {
+    background: var(--blue-tint);
+  }
+
+  .hero-proof:hover,
+  .hero-proof:focus-visible {
+    color: var(--navy);
   }
 
   .testimonial-box:hover {
@@ -1305,9 +1722,16 @@ img {
     background: var(--blue-tint);
   }
 
+  /* The step badge brightens and picks up a soft halo */
+  .process-step:hover .step-badge {
+    background: var(--blue);
+    box-shadow: 0 0 0 6px var(--blue-tint-strong);
+  }
+
   .faq-item:hover,
   .faq-item:has(summary:focus-visible) {
     background: var(--blue-tint);
+    border-color: color-mix(in srgb, var(--blue) 40%, var(--line));
   }
 
   .faq-item[open]:not([data-open="false"]):hover,
@@ -1329,6 +1753,19 @@ img {
   from {
     opacity: 0;
     transform: translateY(14px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
   }
 }
 
@@ -1358,6 +1795,14 @@ img {
 
   .nav-pills.is-open {
     animation: rise-in var(--dur-base) var(--ease-out);
+  }
+
+  .lightbox[open] {
+    animation: pop-in var(--dur-base) var(--ease-out);
+  }
+
+  .lightbox[open]::backdrop {
+    animation: fade-in var(--dur-base) var(--ease-out);
   }
 
   /* Scroll reveal. Hidden only once MotionController has added reveal-ready. */
@@ -1464,9 +1909,30 @@ img {
   .service-card:hover,
   .service-card:focus-visible,
   .pricing-card:hover,
-  .pricing-card:has(:focus-visible),
-  .testimonial-box:hover {
+  .pricing-card:has(:focus-visible) {
+    transform: translateY(-4px);
+  }
+
+  .testimonial-box:hover,
+  .result-stat:hover {
     transform: translateY(-3px);
+  }
+
+  .result-stat:hover::before,
+  .pricing-card:hover::before,
+  .pricing-card:has(:focus-visible)::before {
+    transform: scaleX(1);
+  }
+
+  .result-shot-frame:hover img,
+  .result-shot-frame:focus-visible img,
+  .results-banner:hover img {
+    transform: scale(1.02);
+  }
+
+  .hero-proof:hover svg:last-child,
+  .hero-proof:focus-visible svg:last-child {
+    transform: translateX(3px);
   }
 
   .service-card:hover .icon-wrap,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
+import { content, isPlaceholder } from "../lib/content";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -17,12 +18,26 @@ const barlow = Barlow_Condensed({
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://adsboosters.pk";
 const isProduction = process.env.NODE_ENV === "production";
+const metaPixelId = (process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "").replace(
+  /\D/g,
+  "",
+);
+const { address, phone, social } = content.footer;
 
 const organizationSchema = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "ProfessionalService",
   name: "AdsBoosters.pk",
   url: siteUrl,
+  image: `${siteUrl}/logo.webp`,
+  telephone: phone.href.replace("tel:", ""),
+  email: content.footer.email,
+  address: {
+    "@type": "PostalAddress",
+    ...(isPlaceholder(address) ? {} : { streetAddress: address }),
+    addressLocality: "Lahore",
+    addressCountry: "PK",
+  },
   description:
     "Google and Meta ads, Google ranking and social media management for businesses in Pakistan.",
   knowsAbout: [
@@ -54,9 +69,9 @@ const organizationSchema = {
       "@type": "Offer",
       itemOffered: {
         "@type": "Service",
-        name: "Google Page Ranking",
+        name: "SEO and Google Maps ranking",
         description:
-          "Help your business show higher on Google Search and Maps.",
+          "Help your business show higher on Google Search and Google Maps.",
       },
     },
     {
@@ -70,10 +85,7 @@ const organizationSchema = {
     },
   ],
   areaServed: { "@type": "Country", name: "Pakistan" },
-  sameAs: [
-    "https://www.facebook.com/profile.php?id=61593563594054",
-    "https://www.instagram.com/adsboosters.pk",
-  ],
+  sameAs: social.map(({ href }) => href),
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer service",
@@ -108,7 +120,7 @@ export const metadata: Metadata = {
     description: SEO_DESCRIPTION,
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SEO_TITLE,
     description: SEO_DESCRIPTION,
   },
@@ -156,6 +168,17 @@ gtag('config', 'G-VKXFX75ZRM');
 gtag('config', 'G-GTMDWH0T54');`}
           </Script>
         </>
+      ) : null}
+      {isProduction && metaPixelId ? (
+        <Script id="meta-pixel" strategy="afterInteractive">
+          {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${metaPixelId}');
+fbq('track', 'PageView');`}
+        </Script>
       ) : null}
       <body>{children}</body>
     </html>

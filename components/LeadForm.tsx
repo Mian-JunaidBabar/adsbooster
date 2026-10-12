@@ -3,6 +3,7 @@
 import { ArrowRight, Check, MessageSquareText } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { budgetOptions, businessTypes } from "../lib/form-options";
+import { trackLead } from "../lib/track";
 
 type LeadFormState = {
   name: string;
@@ -17,14 +18,15 @@ type LeadFormState = {
 
 type FormErrors = Partial<Record<keyof LeadFormState, string>>;
 
+// Same order as the fields on screen, so the first error found is focused first.
 const initialForm: LeadFormState = {
   name: "",
-  email: "",
+  phone: "",
   businessType: "",
   businessTypeOther: "",
   city: "",
-  phone: "",
   budget: "",
+  email: "",
   company: "",
 };
 
@@ -110,8 +112,9 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
 
     const nextErrors: FormErrors = {};
 
+    const optional = ["company", "businessTypeOther", "email"];
     Object.entries(form).forEach(([key, value]) => {
-      if (key !== "company" && key !== "businessTypeOther" && !value.trim()) {
+      if (!optional.includes(key) && !value.trim()) {
         nextErrors[key as keyof LeadFormState] = "This field is required.";
       }
     });
@@ -164,6 +167,8 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
       setForm(initialForm);
       setErrors({});
       setIsSent(true);
+      // Only after the server confirmed the lead was saved.
+      trackLead("form", "audit");
     } catch {
       setServerMessage("Something went wrong. Please try again.");
     } finally {
@@ -181,13 +186,13 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
 
   if (isSent) {
     return (
-      <div className="audit-card-inner audit-success">
-        <div className="small-label">Free ad audit</div>
-        <h2>Thanks, we have your details.</h2>
+      <div className="audit-card-inner audit-success" role="status">
         <div className="success-box">
           <Check size={18} aria-hidden="true" />
           <span>Enquiry received</span>
         </div>
+        <h3>Thanks, we have your details.</h3>
+        <p>We&apos;ll reply on WhatsApp shortly.</p>
         {whatsappHref ? (
           <a
             className="whatsapp-button full-width"
@@ -207,10 +212,12 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
   }
 
   return (
-    <form className="audit-card-inner" onSubmit={handleSubmit} noValidate>
-      <div className="small-label">Free ad audit</div>
-      <h2>Tell us about your business.</h2>
-
+    <form
+      className="audit-card-inner"
+      onSubmit={handleSubmit}
+      noValidate
+      aria-label="Free audit form"
+    >
       {/* Honeypot field */}
       <input
         type="text"
@@ -237,16 +244,16 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
       </label>
 
       <label className="field-block">
-        <span>Email address</span>
+        <span>WhatsApp number</span>
         <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleFieldChange("email")}
-          placeholder="ali@example.com"
-          {...fieldProps("email", errors)}
+          type="tel"
+          name="phone"
+          value={form.phone}
+          onChange={handleFieldChange("phone")}
+          placeholder="03XX XXXXXXX"
+          {...fieldProps("phone", errors)}
         />
-        {errors.email ? <small id="email-error">{errors.email}</small> : null}
+        {errors.phone ? <small id="phone-error">{errors.phone}</small> : null}
       </label>
 
       <label className="field-block">
@@ -306,19 +313,6 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
       </label>
 
       <label className="field-block">
-        <span>WhatsApp number</span>
-        <input
-          type="tel"
-          name="phone"
-          value={form.phone}
-          onChange={handleFieldChange("phone")}
-          placeholder="03XX XXXXXXX"
-          {...fieldProps("phone", errors)}
-        />
-        {errors.phone ? <small id="phone-error">{errors.phone}</small> : null}
-      </label>
-
-      <label className="field-block">
         <span>Monthly ad budget</span>
         <select
           name="budget"
@@ -338,10 +332,25 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
         ) : null}
       </label>
 
+      <label className="field-block">
+        <span>
+          Email address <em>(optional)</em>
+        </span>
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleFieldChange("email")}
+          placeholder="ali@example.com"
+          {...fieldProps("email", errors)}
+        />
+        {errors.email ? <small id="email-error">{errors.email}</small> : null}
+      </label>
+
       {serverMessage ? <div className="form-error">{serverMessage}</div> : null}
 
       <button type="submit" className="primary-button" disabled={isSubmitting}>
-        {isSubmitting ? "Sending..." : "Send my details"}
+        {isSubmitting ? "Sending..." : "Get my free audit"}
         {!isSubmitting ? <ArrowRight size={16} aria-hidden="true" /> : null}
       </button>
     </form>

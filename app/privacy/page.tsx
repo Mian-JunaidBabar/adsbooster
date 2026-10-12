@@ -1,9 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { content } from "../../lib/content";
+
+const title = "Privacy Policy | AdsBoosters.pk";
+const description = "How AdsBoosters.pk collects and uses enquiry information.";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | AdsBoosters.pk",
-  description: "How AdsBoosters.pk collects and uses enquiry information.",
+  title,
+  description,
+  // Each legal page is its own canonical, not the homepage.
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    type: "website",
+    locale: "en_PK",
+    siteName: "AdsBoosters.pk",
+    url: "/privacy",
+    title,
+    description,
+    // A page-level openGraph replaces the root one, so the image is re-listed.
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function PrivacyPage() {
@@ -23,9 +39,9 @@ export default function PrivacyPage() {
         <section className="legal-section">
           <h2>Information we collect</h2>
           <p>
-            When you request an ad audit, we may collect your name, email
-            address, business type, city, WhatsApp number, and estimated monthly
-            ad budget.
+            When you request an ad audit, we may collect your name, WhatsApp
+            number, business type, city, estimated monthly ad budget and, if you
+            choose to give it, your email address.
           </p>
         </section>
 
@@ -58,6 +74,18 @@ export default function PrivacyPage() {
         </section>
 
         <section className="legal-section">
+          <h2>Meta Pixel</h2>
+          <p>
+            We use the Meta Pixel to measure our Facebook and Instagram ads. It
+            records page visits and when someone sends the audit form or taps a
+            WhatsApp button, so we can see which ads bring enquiries. It does
+            not send the details you type into the form. Meta may use cookies
+            for this; you can control ad preferences in your Facebook or
+            Instagram settings and block cookies in your browser.
+          </p>
+        </section>
+
+        <section className="legal-section">
           <h2>Retention and security</h2>
           <p>
             We keep enquiry information only for as long as it is useful for
@@ -72,9 +100,7 @@ export default function PrivacyPage() {
           <p>
             You can ask us to correct or delete your enquiry information by
             emailing{" "}
-            <a href="mailto:adsboosters6030@gmail.com">
-              adsboosters6030@gmail.com
-            </a>
+            <a href={`mailto:${content.footer.email}`}>{content.footer.email}</a>
             .
           </p>
         </section>
@@ -83,9 +109,7 @@ export default function PrivacyPage() {
           <h2>Contact</h2>
           <p>
             Questions about this policy can be sent to{" "}
-            <a href="mailto:adsboosters6030@gmail.com">
-              adsboosters6030@gmail.com
-            </a>
+            <a href={`mailto:${content.footer.email}`}>{content.footer.email}</a>
             .
           </p>
         </section>
