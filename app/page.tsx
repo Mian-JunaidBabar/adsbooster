@@ -244,24 +244,22 @@ export default function Home() {
             </div>
 
             <div className="testimonial-grid">
-              {testimonials.map(
-                ({ quote, name, role, business, city }, i) => (
-                  <blockquote
-                    key={quote}
-                    className="testimonial-box"
-                    {...reveal(i)}
-                  >
-                    <p>{quote}</p>
-                    <footer>
-                      <strong>{name}</strong>
-                      <span>{role}</span>
-                      <span>
-                        {business}, {city}
-                      </span>
-                    </footer>
-                  </blockquote>
-                ),
-              )}
+              {testimonials.map(({ quote, name, role, business, city }, i) => (
+                <blockquote
+                  key={quote}
+                  className="testimonial-box"
+                  {...reveal(i)}
+                >
+                  <p>{quote}</p>
+                  <footer>
+                    <strong>{name}</strong>
+                    <span>{role}</span>
+                    <span>
+                      {business}, {city}
+                    </span>
+                  </footer>
+                </blockquote>
+              ))}
             </div>
           </div>
         </section>
