@@ -109,20 +109,47 @@ img {
   color: var(--ink);
 }
 
+/* Floating header: a white card with a soft shadow, inset from the top */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
+  padding-top: 12px;
 }
 
 .header-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: var(--header-height);
+  min-height: calc(var(--header-height) - 24px);
   gap: 16px;
+  padding: 0 12px 0 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.header-phone svg {
+  color: var(--boost);
 }
 
 .brand-lockup {
@@ -170,40 +197,54 @@ img {
 .nav-pills {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
-.nav-pills a,
-.nav-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--ink);
+/* Text links; the active section gets a boost-blue underline */
+.nav-pills a {
+  position: relative;
+  padding: 8px 12px;
+  color: var(--ink-soft);
   font-weight: 600;
   font-size: 0.9375rem;
   line-height: 1.4;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    color var(--dur-base) var(--ease-out);
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.nav-pills a::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 2px;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--boost);
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 .nav-pills a.active {
-  border-color: var(--navy);
-  background: var(--navy);
-  color: white;
+  color: var(--ink);
+}
+
+.nav-pills a.active::after {
+  transform: scaleX(1);
 }
 
 .nav-toggle {
   display: none;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
   padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-out);
 }
 
 .primary-button,
@@ -258,34 +299,18 @@ img {
 }
 
 .header-whatsapp {
-  padding: 0.8rem 1.2rem;
+  padding: 0.7rem 1.15rem;
   font-size: 0.94rem;
 }
 
+/* The hero runs up behind the floating header */
 .hero-section {
   position: relative;
   overflow: hidden;
-  background: var(--paper);
-  padding: clamp(40px, 6vw, 80px) 0 clamp(48px, 7vw, 96px);
-}
-
-.hero-map {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 40%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 40%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
+  margin-top: calc(-1 * var(--header-height));
+  padding: calc(var(--header-height) + clamp(32px, 5vw, 72px)) 0
+    clamp(48px, 7vw, 96px);
+  background: linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 100%);
 }
 
 .hero-grid {
@@ -322,10 +347,30 @@ img {
   background: var(--boost);
 }
 
+/* Hero badge: the eyebrow as a tinted pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--boost-tint);
+  color: var(--boost-hover);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 .accent {
+  color: var(--boost);
+}
+
 .hero-copy h1 {
   margin: 0;
   max-width: 16ch;
-  font-size: clamp(2.25rem, 1.3rem + 2.6vw, 4rem);
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 3.5rem);
   line-height: 1.08;
   letter-spacing: -0.035em;
   font-weight: 800;
@@ -338,6 +383,92 @@ img {
   color: var(--ink-soft);
   font-size: clamp(1.06rem, 0.88rem + 0.5vw, 1.4rem);
   line-height: 1.6;
+}
+
+/* Hero right side: floating proof cards around a phone drawing */
+.hero-visual {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1 / 0.92;
+}
+
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 6% 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--boost-tint), transparent);
+}
+
+.hero-phone {
+  --i: 5;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  margin-left: -26%;
+  width: 52%;
+}
+
+.float-card {
+  position: absolute;
+  width: 50%;
+  max-width: 260px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.float-card:nth-of-type(1) {
+  top: 12%;
+  left: 0;
+}
+
+.float-card:nth-of-type(2) {
+  right: 0;
+  bottom: 10%;
+}
+
+.float-card-value {
+  margin: 0;
+  color: var(--boost);
+  font-size: clamp(2rem, 1.4rem + 1.4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.float-card-label {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.float-card-label strong {
+  color: var(--ink-soft);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--boost-tint);
+  color: var(--boost-hover);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.chip svg {
+  flex: none;
 }
 
 .cta-stack {
@@ -1460,23 +1591,14 @@ img {
   .hero-grid {
     grid-template-columns: 1fr;
   }
+  .hero-visual {
+    justify-self: center;
+  }
 }
 
-/* Desktop: with the form gone the map fills the hero's right side */
-@media (min-width: 1025px) {
-  .hero-map {
-    mask-image: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.15) 0%,
-      rgba(0, 0, 0, 0.6) 45%,
-      rgba(0, 0, 0, 1) 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.15) 0%,
-      rgba(0, 0, 0, 0.6) 45%,
-      rgba(0, 0, 0, 1) 100%
-    );
+@media (max-width: 1179px) {
+  .header-phone {
+    display: none;
   }
 }
 
@@ -1491,20 +1613,38 @@ img {
   }
   .nav-pills.is-open {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     right: 0;
     left: 0;
-    padding: 12px var(--gutter) 16px;
-    border-bottom: 1px solid var(--line);
-    background: var(--paper);
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+  }
+  .nav-pills.is-open a {
+    padding: 12px 14px;
+  }
+  .nav-pills.is-open a::after {
+    right: auto;
+    bottom: 50%;
+    left: 0;
+    width: 3px;
+    height: 18px;
+    margin-bottom: -9px;
+    transform: scaleY(0);
+  }
+  .nav-pills.is-open a.active::after {
+    transform: none;
   }
 }
 
 @media (max-width: 767px) {
   :root {
-    --header-height: 72px;
+    --header-height: 76px;
   }
   .brand-lockup {
     font-size: clamp(1.3rem, 0.8rem + 3vw, 2rem);
@@ -1513,7 +1653,16 @@ img {
     flex-basis: 170px;
     width: 170px;
   }
+  .site-header {
+    padding-top: 8px;
+  }
   .header-inner {
+    gap: 8px;
+    min-height: calc(var(--header-height) - 16px);
+    padding: 0 8px 0 14px;
+    border-radius: var(--radius-lg);
+  }
+  .header-actions {
     gap: 8px;
   }
   .header-whatsapp {
@@ -1523,7 +1672,41 @@ img {
     font-size: 0.82rem;
   }
   .hero-section {
-    padding-top: 28px;
+    padding-top: calc(var(--header-height) + 24px);
+  }
+  .badge {
+    padding: 5px 12px;
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+  }
+  /* Phones: the two cards sit side by side under the CTA, no drawing */
+  .hero-visual {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-width: none;
+    aspect-ratio: auto;
+  }
+  .hero-visual::before,
+  .hero-phone {
+    display: none;
+  }
+  .float-card {
+    position: static;
+    width: auto;
+    padding: 14px;
+    transform: rotate(-1.5deg);
+  }
+  .float-card:nth-of-type(2) {
+    margin-top: 18px;
+    transform: rotate(1.5deg);
+  }
+  .float-card-value {
+    font-size: 1.75rem;
+  }
+  .chip {
+    padding: 4px 10px;
+    font-size: 0.75rem;
   }
   /* The headline scales with the screen so it stays on two lines on any phone */
   .hero-copy h1 {
@@ -1605,43 +1788,6 @@ img {
   }
 }
 
-/* Hero background: two soft blurs, no filters, moved by transform only */
-.hero-shapes {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.hero-shapes .shape {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.hero-shapes .shape-1 {
-  top: -180px;
-  left: -140px;
-  width: 560px;
-  height: 560px;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--cyan) 30%, transparent),
-    transparent
-  );
-}
-
-.hero-shapes .shape-2 {
-  right: -120px;
-  bottom: -160px;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--blue) 20%, transparent),
-    transparent
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Hover: colour only here. Movement is further down, motion-gated.    */
 /* Every hover state has a matching :focus-visible state.              */
@@ -1649,14 +1795,14 @@ img {
 @media (hover: hover) and (pointer: fine) {
   .nav-pills a:hover,
   .nav-pills a:focus-visible,
-  .nav-toggle:hover,
-  .nav-toggle:focus-visible {
-    background: var(--blue-tint);
+  .header-phone:hover,
+  .header-phone:focus-visible {
+    color: var(--boost);
   }
 
-  .nav-pills a.active:hover,
-  .nav-pills a.active:focus-visible {
-    background: var(--navy);
+  .nav-toggle:hover,
+  .nav-toggle:focus-visible {
+    background: var(--boost-tint);
   }
 
   .primary-button:not(:disabled):hover,
@@ -1795,12 +1941,6 @@ img {
   }
 }
 
-@keyframes drift {
-  to {
-    transform: translate3d(48px, 32px, 0);
-  }
-}
-
 @keyframes slide-bar {
   to {
     transform: translateX(-50%);
@@ -1865,22 +2005,11 @@ img {
   }
 
   /* Ambient loops. Paused while off screen (MotionController sets data-paused). */
-  .hero-shapes .shape {
-    animation: drift 24s var(--ease-out) infinite alternate;
-    will-change: transform;
-  }
-
-  .hero-shapes .shape-2 {
-    animation-duration: 30s;
-    animation-delay: -9s;
-  }
-
   .final-cta::before {
     animation: slide-bar 12s var(--ease-out) infinite alternate;
     will-change: transform;
   }
 
-  [data-paused="true"] .shape,
   .final-cta[data-paused="true"]::before {
     animation-play-state: paused;
     will-change: auto;

@@ -15,6 +15,7 @@ import {
 import type { CSSProperties } from "react";
 import CountUp from "../components/CountUp";
 import FaqItem from "../components/FaqItem";
+import HeroCards from "../components/HeroCards";
 import LeadForm from "../components/LeadForm";
 import MotionController from "../components/MotionController";
 import NavPills from "../components/NavPills";
@@ -93,6 +94,12 @@ export default function Home() {
   const hasQuote =
     !isPlaceholder(results.quote.text) && !isPlaceholder(results.quote.name);
   const { address } = content.footer;
+  const { headline, headlineAccent } = content.hero;
+  // The accent is the last phrase of the headline.
+  const headlineLead = headline.slice(
+    0,
+    headline.length - headlineAccent.length,
+  );
 
   return (
     <main className="adsbooster-page">
@@ -117,44 +124,38 @@ export default function Home() {
 
           <NavPills items={content.nav} />
 
-          {hasWhatsApp ? (
-            <a
-              className="whatsapp-button header-whatsapp"
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp"
-            >
-              <WhatsAppIcon />
-              <span className="header-whatsapp-label">WhatsApp</span>
+          <div className="header-actions">
+            <a className="header-phone" href={content.footer.phone.href}>
+              <Phone size={16} aria-hidden="true" />
+              {content.footer.phone.label}
             </a>
-          ) : null}
+            {hasWhatsApp ? (
+              <a
+                className="whatsapp-button header-whatsapp"
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat on WhatsApp"
+              >
+                <WhatsAppIcon />
+                <span className="header-whatsapp-label">WhatsApp</span>
+              </a>
+            ) : null}
+          </div>
         </div>
       </header>
 
       <section id="hero" className="hero-section" data-hero>
-        <div className="hero-shapes" aria-hidden="true" data-pause-offscreen>
-          <div className="shape shape-1" />
-          <div className="shape shape-2" />
-        </div>
-        <div className="hero-map">
-          <Image
-            src="/hero-map.webp"
-            alt="World map outline"
-            fill
-            priority
-            sizes="100vw"
-            style={{ objectFit: "cover", opacity: 0.5 }}
-          />
-        </div>
-
         <div className="container hero-grid">
           <div className="hero-copy">
-            <div className="eyebrow hero-rise" style={rise(0)}>
+            <div className="badge hero-rise" style={rise(0)}>
               {content.hero.eyebrow}
             </div>
 
-            <h1>{content.hero.headline}</h1>
+            <h1>
+              {headlineLead}
+              <span className="accent">{headlineAccent}</span>
+            </h1>
 
             <p className="hero-subline hero-rise" style={rise(1)}>
               {content.hero.subline}
@@ -194,6 +195,12 @@ export default function Home() {
               </a>
             </div>
           </div>
+
+          <HeroCards
+            client={content.hero.cards.client}
+            stats={results.stats.slice(0, 2)}
+            chips={content.hero.cards.chips}
+          />
         </div>
       </section>
 

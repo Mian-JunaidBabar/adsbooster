@@ -57,6 +57,8 @@ export const content = {
   hero: {
     eyebrow: "PERFORMANCE ADS · GOOGLE · META · SOCIAL MEDIA",
     headline: "More leads and sales from ads that pay back.",
+    /** The end of `headline` shown in the accent colour. */
+    headlineAccent: "ads that pay back.",
     subline:
       "We plan, run and manage your Google and Meta ads and your social media, then report every week in plain numbers: enquiries, cost per lead, sales.",
     checklist: [
@@ -68,6 +70,11 @@ export const content = {
       "Assalam o Alaikum, mujhe apne business ke liye ads aur social media se zyada leads chahiye.",
     whatsappReplyText: "Replies within 15 minutes, 10am–8pm",
     proofLine: "123K views in 28 days for SS Traders, Lahore",
+    /** Floating cards beside the hero: the first two results stats, each with a chip. */
+    cards: {
+      client: "SS Traders, Lahore",
+      chips: ["42,208 people reached", "Via Meta Business Suite"],
+    },
   },
   /** Client proof. Bracketed values are placeholders and stay hidden until filled. */
   results: {
