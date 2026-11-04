@@ -259,7 +259,7 @@ img {
   font-weight: 700;
   cursor: pointer;
   transition:
-    transform var(--dur-fast) var(--ease-out),
+    transform var(--dur-spring) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-out),
     background-color var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out),
@@ -269,7 +269,7 @@ img {
 .primary-button svg,
 .secondary-button svg,
 .whatsapp-button svg {
-  transition: transform var(--dur-fast) var(--ease-out);
+  transition: transform var(--dur-spring) var(--ease-spring);
 }
 
 .primary-button,
@@ -672,7 +672,7 @@ img {
 }
 
 .page-section {
-  padding: clamp(64px, 8vw, 112px) 0;
+  padding: clamp(64px, 7vw, 96px) 0;
 }
 
 .surface-section {
@@ -786,7 +786,7 @@ img {
 .pricing-card,
 .testimonial-box {
   transition:
-    transform var(--dur-base) var(--ease-out),
+    transform var(--dur-spring) var(--ease-spring),
     box-shadow var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out),
     background-color var(--dur-base) var(--ease-out);
@@ -840,7 +840,7 @@ img {
   background: color-mix(in srgb, var(--accent) 16%, var(--surface));
   color: var(--accent-ink);
   transition:
-    transform var(--dur-base) var(--ease-out),
+    transform var(--dur-spring) var(--ease-spring),
     background-color var(--dur-base) var(--ease-out),
     color var(--dur-base) var(--ease-out);
 }
@@ -873,7 +873,7 @@ img {
 }
 
 .card-cue svg {
-  transition: transform var(--dur-fast) var(--ease-out);
+  transition: transform var(--dur-spring) var(--ease-spring);
 }
 
 /* Process: numbered badges joined by a line */
@@ -2106,6 +2106,19 @@ img {
   }
 }
 
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+  }
+}
+
+/* Hero cards: a slow 5px float, alternated */
+@keyframes float {
+  to {
+    transform: translateY(-5px);
+  }
+}
+
 @keyframes pop-in {
   from {
     opacity: 0;
@@ -2121,9 +2134,35 @@ img {
 
 @media (prefers-reduced-motion: no-preference) {
   /* Hero entrance: 60 ms between pieces. The H1 and the form stay still. */
+  /* Opacity eases out; the 14px rise runs on the spring. */
   .hero-rise {
-    animation: rise-in var(--dur-reveal) var(--ease-out) backwards;
+    animation:
+      fade-in var(--dur-reveal) var(--ease-out) backwards,
+      rise var(--dur-spring) var(--ease-spring) backwards;
     animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  /* After rising in, the cards float out of step. Desktop and tablet only:
+     on phones they sit tilted in the flow. */
+  @media (min-width: 768px) {
+    .float-card {
+      animation:
+        fade-in var(--dur-reveal) var(--ease-out) backwards,
+        rise var(--dur-spring) var(--ease-spring) backwards,
+        float 6.5s ease-in-out infinite alternate;
+      animation-delay:
+        calc(var(--i) * 60ms),
+        calc(var(--i) * 60ms),
+        calc(var(--i) * 60ms + var(--dur-spring));
+    }
+
+    .float-card:nth-of-type(2) {
+      animation-duration: var(--dur-reveal), var(--dur-spring), 8s;
+    }
+
+    [data-paused="true"] .float-card {
+      animation-play-state: paused;
+    }
   }
 
   .fade-rise,
@@ -2150,7 +2189,9 @@ img {
   }
 
   [data-reveal].is-revealed:not(.is-instant) {
-    animation: rise-in var(--dur-reveal) var(--ease-out) backwards;
+    animation:
+      fade-in var(--dur-reveal) var(--ease-out) backwards,
+      rise var(--dur-spring) var(--ease-spring) backwards;
     animation-delay: var(--reveal-delay, 0ms);
   }
 
@@ -2172,7 +2213,7 @@ img {
   .process-step.is-revealed .step-badge {
     transition:
       opacity var(--dur-base) var(--ease-out),
-      transform var(--dur-base) var(--ease-out);
+      transform var(--dur-spring) var(--ease-spring);
     transition-delay: calc(var(--reveal-delay, 0ms) + 150ms);
   }
 
@@ -2195,8 +2236,9 @@ img {
     transition: transform var(--dur-base) var(--ease-out);
   }
 
-  .link-underline::after {
-    transition: transform var(--dur-base) var(--ease-out);
+  .link-underline::after,
+  .nav-pills a::after {
+    transition: transform var(--dur-spring) var(--ease-spring);
   }
 
   .mobile-sticky-cta {
@@ -2213,6 +2255,7 @@ img {
   .secondary-button:active,
   .whatsapp-button:active {
     transform: scale(0.97);
+    transition-duration: var(--dur-fast);
   }
 }
 
@@ -2237,7 +2280,12 @@ img {
   .service-card:focus-visible,
   .pricing-card:hover,
   .pricing-card:has(:focus-visible) {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+  }
+
+  .nav-pills a:hover::after,
+  .nav-pills a:focus-visible::after {
+    transform: scaleX(1);
   }
 
   .testimonial-box:hover {

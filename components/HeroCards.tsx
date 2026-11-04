@@ -11,11 +11,12 @@ type HeroCardsProps = {
 
 /**
  * The hero's right side: real results numbers on floating cards around a
- * phone drawing. Rises in after the hero copy (hero entrance index 6 on).
+ * phone drawing. Rises in after the hero copy (hero entrance index 6 on),
+ * then the cards drift slowly; the loop pauses while off screen.
  */
 export default function HeroCards({ client, stats, chips }: HeroCardsProps) {
   return (
-    <div className="hero-visual">
+    <div className="hero-visual" data-pause-offscreen>
       <PhoneChatMotif className="hero-phone hero-rise" />
       {stats.map(({ value, prefix, suffix, label }, i) => (
         <div

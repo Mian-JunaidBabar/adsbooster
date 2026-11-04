@@ -158,7 +158,7 @@ export default function Home() {
               <span className="accent">{headlineAccent}</span>
             </h1>
 
-            <p className="hero-subline hero-rise" style={rise(1)}>
+            <p className="hero-subline">
               {content.hero.subline}
             </p>
 
@@ -171,10 +171,7 @@ export default function Home() {
               ))}
             </ul>
 
-            <div
-              className="cta-stack hero-rise"
-              style={rise(2 + content.hero.checklist.length)}
-            >
+            <div className="cta-stack">
               {hasWhatsApp ? (
                 <a
                   className="whatsapp-button full-width"
