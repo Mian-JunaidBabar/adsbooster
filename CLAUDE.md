@@ -4,9 +4,9 @@ Single-page paid-ads landing page for a Pakistani performance ads agency, plus a
 
 ## Sources of truth
 
-- `design/DESIGN.md` and `design/tokens.css`: the visual system. Follow them exactly.
-- `design/reference/landing.source.html`, `design-system-components.js`, and the two screenshots: the approved design. The page must match the screenshots at 1440px and 390px.
-- If the code and the design disagree, the design wins, unless the design is broken (see the known issues in the kickoff prompt).
+- `REDESIGN_PLAN.md`: the visual system (palette, type, radii, shadows, components) and the phased redesign. Tokens live in `:root` in `app/globals.css`.
+- `reference1.png` to `reference9.png`: the quality bar for the redesign. Match their feel, not their content or colours (no orange).
+- If the code and the plan disagree, the plan wins, unless it breaks a rule below.
 
 ## Stack
 
@@ -29,16 +29,16 @@ Next.js (App Router) + TypeScript strict + Tailwind or CSS variables from tokens
 - Never log phone numbers, names or full request bodies. Log ids.
 - Verify signatures on every webhook. Rate limit every public endpoint.
 
-## Design guardrails (from DESIGN.md)
+## Design guardrails
 
 - WhatsApp green is used only on WhatsApp buttons.
 - No purple gradients, glassmorphism, emoji icons, stock photos, or fake counters.
 - Motion (one system, see `app/globals.css`):
   - Animate `transform` and `opacity` only, plus `background-color`, `border-color`, `box-shadow` and `color` on hover. Never width, height, top, left or margin. The FAQ answer (`grid-template-rows` 0fr to 1fr) is the single allowed exception.
-  - Ease `--ease-out`. Durations are tokens: `--dur-fast` 160ms (hover, press), `--dur-base` 300ms (colour changes), `--dur-reveal` 600ms (scroll reveals). Only the count-up (1600ms), the process line draw (800ms), the FAQ (250ms) and the ambient loops (hero drift, final CTA bar) run longer.
+  - Ease `--ease-out`. Transforms may use `--ease-spring` / `--ease-spring-soft` (`linear()` springs, overshoot under 2%, `--dur-spring` 500ms); opacity and colour always use `--ease-out`. Durations are tokens: `--dur-fast` 160ms (hover, press), `--dur-base` 300ms (colour changes), `--dur-reveal` 600ms (scroll reveals). Only the count-up (1600ms), the process line draw (800ms), the FAQ (250ms) and the ambient loops (hero drift, final CTA bar) run longer.
   - Hover rules live inside `@media (hover: hover) and (pointer: fine)` and have a matching `:focus-visible` state. Movement is also gated by `prefers-reduced-motion: no-preference`; with reduced motion nothing moves, colour changes stay, reveals show content at once and the count-up shows the final value.
   - Content is never hidden at rest. Reveals use `data-reveal` and `MotionController`, and CSS only hides content once JS has added `reveal-ready`. Never reveal the hero H1, the hero WhatsApp button or the form.
-  - Small movement only: lifts 2 to 4px, reveals 12 to 16px, scale at most 1.02 (the icon badge hover is the one 1.06 exception). No bounce, spin or flash. No animation library.
+  - Small movement only: lifts 2 to 4px, reveals 12 to 16px, scale at most 1.02 (the icon badge hover is the one 1.06 exception). No visible bounce, spin or flash. No animation library.
 - Headlines max 2 lines at 390px. The WhatsApp button must be visible in the first mobile screen.
 
 ## Commands
