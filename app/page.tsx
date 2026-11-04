@@ -17,6 +17,7 @@ import CountUp from "../components/CountUp";
 import FaqItem from "../components/FaqItem";
 import HeroCards from "../components/HeroCards";
 import LeadForm from "../components/LeadForm";
+import { ThinkingMotif } from "../components/motifs";
 import MotionController from "../components/MotionController";
 import NavPills from "../components/NavPills";
 import ResultShots from "../components/ResultShots";
@@ -201,6 +202,36 @@ export default function Home() {
             stats={results.stats.slice(0, 2)}
             chips={content.hero.cards.chips}
           />
+        </div>
+      </section>
+
+      <section className="trust-strip" aria-label="How we work">
+        <div className="container trust-grid">
+          {content.trust.map(({ label, text }, i) => (
+            <div key={label} className="trust-item" {...reveal(i)}>
+              <div className="trust-label">{label}</div>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="page-section paper-section">
+        <div className="container">
+          <div className="pains-head">
+            <ThinkingMotif className="pains-motif" />
+            <div className="section-heading-block" {...reveal()}>
+              <div className="eyebrow">{content.pains.eyebrow}</div>
+              <h2>{content.pains.headline}</h2>
+              <p className="section-lead">{content.pains.subline}</p>
+            </div>
+          </div>
+
+          <div className="card-grid three-up">
+            {content.pains.items.map((item, i) => (
+              <ServiceCard key={item.title} {...item} index={i} />
+            ))}
+          </div>
         </div>
       </section>
 

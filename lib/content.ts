@@ -76,6 +76,53 @@ export const content = {
       chips: ["42,208 people reached", "Via Meta Business Suite"],
     },
   },
+  /** Facts under the hero. Each one is also answered in the FAQ. */
+  trust: [
+    { label: "Contract", text: "Month to month, no lock-in" },
+    { label: "Ownership", text: "Ad accounts, pixel and pages stay yours" },
+    { label: "Ad spend", text: "Paid directly to Google and Meta" },
+    { label: "Replies", text: "Within 15 minutes, 10am–8pm" },
+  ],
+  pains: {
+    eyebrow: "Sound familiar?",
+    headline: "Which of these is costing you customers?",
+    subline: "Pick yours, or message us and we'll tell you where to start.",
+    items: [
+      {
+        title: "“We boost posts but nobody messages.”",
+        description:
+          "Likes come in, enquiries don't. A boosted post is not a lead campaign.",
+        icon: Megaphone,
+        accent: "blue",
+        href: whatsappLink(
+          "Assalam o Alaikum, hum posts boost karte hain lekin messages nahi aate. Meta Ads ke bare mein baat karni hai.",
+        ),
+        cue: "Fix it with Meta Ads",
+      },
+      {
+        title: "“Customers search for us and find competitors.”",
+        description:
+          "People type what you sell into Google and call whoever shows up first.",
+        icon: Search,
+        accent: "blue",
+        href: whatsappLink(
+          "Assalam o Alaikum, log Google par search karte hain lekin competitors ko milte hain. Google Ads ke bare mein baat karni hai.",
+        ),
+        cue: "Fix it with Google Ads",
+      },
+      {
+        title: "“Our page has gone quiet.”",
+        description:
+          "No posts for weeks, so new visitors can't tell if you're still open.",
+        icon: CalendarDays,
+        accent: "blue",
+        href: whatsappLink(
+          "Assalam o Alaikum, hamara page kaafi time se active nahi hai. Social media management ke bare mein baat karni hai.",
+        ),
+        cue: "Fix it with social media",
+      },
+    ] as ServiceItem[],
+  },
   /** Client proof. Bracketed values are placeholders and stay hidden until filled. */
   results: {
     eyebrow: "Results",

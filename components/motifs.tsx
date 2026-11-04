@@ -136,3 +136,72 @@ export function PhoneChatMotif({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** An ad post that isn't working, with a question-mark thought bubble. */
+export function ThinkingMotif({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 180 160"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="90" cy="86" r="68" fill={C.boostTint} />
+
+      {/* Ad post */}
+      <rect
+        x="33"
+        y="73"
+        width="96"
+        height="72"
+        rx="12"
+        fill={C.ink}
+        opacity="0.06"
+      />
+      <rect
+        x="30"
+        y="70"
+        width="96"
+        height="72"
+        rx="12"
+        fill="#fff"
+        stroke={C.line}
+      />
+      <rect
+        x="40"
+        y="80"
+        width="76"
+        height="30"
+        rx="6"
+        fill={C.sky}
+        opacity="0.3"
+      />
+      <path
+        d="M46 96l14 4 14-2 14 3 20-1"
+        fill="none"
+        stroke={C.sky}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect x="40" y="118" width="56" height="6" rx="3" fill={C.grey} />
+      <rect x="40" y="128" width="36" height="6" rx="3" fill={C.grey} />
+
+      {/* Thought bubble */}
+      <circle cx="126" cy="76" r="4" fill="#fff" stroke={C.line} />
+      <circle cx="136" cy="62" r="6" fill="#fff" stroke={C.line} />
+      <ellipse cx="146" cy="34" rx="28" ry="24" fill="#fff" stroke={C.line} />
+      <path
+        d="M138.5 28a7.5 7.5 0 1 1 10.5 6.9c-2 .9-3 2.4-3 4.6v1.5"
+        fill="none"
+        stroke={C.boost}
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <circle cx="146" cy="48" r="2.6" fill={C.boost} />
+
+      <path d={sparkle(18, 44, 9)} fill={C.sun} />
+      <path d={sparkle(160, 122, 6)} fill={C.sky} />
+    </svg>
+  );
+}

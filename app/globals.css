@@ -702,6 +702,71 @@ img {
 .four-up {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+.three-up {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Trust strip: four facts on a white band, split by hairlines */
+.trust-strip {
+  border-block: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.trust-item {
+  padding: 22px 24px;
+}
+
+.trust-item:first-child {
+  padding-left: 0;
+}
+
+.trust-item + .trust-item {
+  border-left: 1px solid var(--line);
+}
+
+.trust-label {
+  color: var(--boost);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.trust-item p {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* "Sound familiar?" heading with its drawing on wide screens */
+.pains-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 32px;
+}
+
+.pains-motif {
+  display: none;
+  width: 168px;
+}
+
+@media (min-width: 1025px) {
+  .pains-head {
+    grid-template-columns: auto 1fr;
+  }
+  .pains-motif {
+    display: block;
+  }
+}
 
 .content-card,
 .pricing-card,
@@ -1674,6 +1739,19 @@ img {
   .hero-section {
     padding-top: calc(var(--header-height) + 24px);
   }
+  .trust-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .trust-item {
+    padding: 16px 14px;
+  }
+  .trust-item:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .trust-item:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
   .badge {
     padding: 5px 12px;
     font-size: 0.65rem;
@@ -1717,6 +1795,7 @@ img {
     max-width: 100%;
   }
   .four-up,
+  .three-up,
   .pricing-grid,
   .testimonial-grid,
   .stats-grid,
