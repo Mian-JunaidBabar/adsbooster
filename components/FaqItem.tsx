@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useRef, type MouseEvent } from "react";
 
 const CLOSE_MS = 250;
@@ -76,7 +75,7 @@ export default function FaqItem({
     >
       <summary onClick={toggle}>
         {question}
-        <ChevronDown className="faq-chevron" size={20} aria-hidden="true" />
+        <span className="faq-icon" aria-hidden="true" />
       </summary>
       <div className="faq-answer">
         <div>

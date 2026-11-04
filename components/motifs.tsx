@@ -205,3 +205,46 @@ export function ThinkingMotif({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** A megaphone with sound waves, for the dark audit panel. */
+export function MegaphoneMotif({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 200 160"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="96" cy="84" r="70" fill="#fff" opacity="0.05" />
+      <rect
+        x="60"
+        y="98"
+        width="14"
+        height="38"
+        rx="5"
+        fill="#fff"
+        opacity="0.85"
+      />
+      <path d="M50 66L120 36v96L50 104z" fill={C.boost} />
+      <ellipse cx="120" cy="84" rx="10" ry="48" fill={C.sky} />
+      <rect x="32" y="64" width="22" height="42" rx="8" fill="#fff" />
+      <path
+        d="M142 64q12 20 0 40"
+        fill="none"
+        stroke={C.sun}
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M158 50q22 34 0 68"
+        fill="none"
+        stroke={C.sun}
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+      <path d={sparkle(22, 30, 9)} fill={C.sun} />
+      <path d={sparkle(180, 138, 6)} fill={C.sky} />
+    </svg>
+  );
+}

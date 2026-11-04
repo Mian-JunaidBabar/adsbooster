@@ -166,6 +166,7 @@ export const content = {
       name: "[Owner name]",
       business: "SS Traders, Lahore",
     },
+    proofTitle: "Screenshots from SS Traders' own Meta and Google accounts",
     ctaLabel: "Get results like this",
     whatsappPrefill:
       "Assalam o Alaikum, I saw the SS Traders results and want the same for my business.",

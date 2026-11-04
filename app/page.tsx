@@ -17,7 +17,7 @@ import CountUp from "../components/CountUp";
 import FaqItem from "../components/FaqItem";
 import HeroCards from "../components/HeroCards";
 import LeadForm from "../components/LeadForm";
-import { ThinkingMotif } from "../components/motifs";
+import { MegaphoneMotif, ThinkingMotif } from "../components/motifs";
 import MotionController from "../components/MotionController";
 import NavPills from "../components/NavPills";
 import ResultShots from "../components/ResultShots";
@@ -259,45 +259,52 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="results-stats">
-            {results.stats.map(({ value, prefix, suffix, label }, i) => (
-              <div
-                key={label}
-                className="result-stat"
-                data-count-scope
-                {...reveal(i)}
-              >
-                <div className="result-stat-value">
-                  <CountUp value={value} prefix={prefix} suffix={suffix} />
-                </div>
-                <p>{label}</p>
+          <div className="case-panel">
+            <div className="case-story">
+              <div className="results-stats">
+                {results.stats.map(({ value, prefix, suffix, label }, i) => (
+                  <div
+                    key={label}
+                    className="result-stat"
+                    data-count-scope
+                    {...reveal(i)}
+                  >
+                    <div className="result-stat-value">
+                      <CountUp value={value} prefix={prefix} suffix={suffix} />
+                    </div>
+                    <p>{label}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <ResultShots shots={results.screenshots} />
+              <div className="results-close" {...reveal()}>
+                {hasQuote ? (
+                  <blockquote className="results-quote">
+                    <p>{results.quote.text}</p>
+                    <footer>
+                      <strong>{results.quote.name}</strong>
+                      <span>{results.quote.business}</span>
+                    </footer>
+                  </blockquote>
+                ) : null}
+                {resultsHref ? (
+                  <a
+                    className="whatsapp-button"
+                    href={resultsHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <WhatsAppIcon />
+                    {results.ctaLabel}
+                  </a>
+                ) : null}
+              </div>
+            </div>
 
-          <div className="results-close" {...reveal()}>
-            {hasQuote ? (
-              <blockquote className="results-quote">
-                <p>{results.quote.text}</p>
-                <footer>
-                  <strong>{results.quote.name}</strong>
-                  <span>{results.quote.business}</span>
-                </footer>
-              </blockquote>
-            ) : null}
-            {resultsHref ? (
-              <a
-                className="whatsapp-button"
-                href={resultsHref}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <WhatsAppIcon />
-                {results.ctaLabel}
-              </a>
-            ) : null}
+            <div className="case-proof">
+              <p className="case-proof-title">{results.proofTitle}</p>
+              <ResultShots shots={results.screenshots} />
+            </div>
           </div>
         </div>
       </section>
@@ -483,6 +490,7 @@ export default function Home() {
                 </a>
               </div>
             ) : null}
+            <MegaphoneMotif className="audit-motif" />
           </div>
         </div>
       </section>

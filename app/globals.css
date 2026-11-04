@@ -527,10 +527,14 @@ img {
 }
 
 .audit-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  background: var(--paper);
-  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
   transition: border-color var(--dur-base) var(--ease-out);
 }
 
@@ -791,9 +795,10 @@ img {
 /* Services: tinted icon badge and a thin accent bar, coloured per card */
 .service-card {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  padding: 27px 22px 24px;
+  padding: 24px;
   background: var(--surface);
   --accent: var(--blue);
   --accent-ink: var(--blue);
@@ -824,14 +829,6 @@ img {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out);
-}
-
-.service-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: var(--accent);
 }
 
 .icon-wrap {
@@ -867,7 +864,8 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 16px;
+  margin-top: auto;
+  padding-top: 16px;
   color: var(--blue);
   font-weight: 700;
   font-size: 0.9375rem;
@@ -902,7 +900,7 @@ img {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--navy);
+  background: var(--boost);
   color: white;
   font-size: 0.9375rem;
   font-weight: 800;
@@ -914,7 +912,7 @@ img {
 
 .process-step h3 {
   margin: 18px 0 10px;
-  font-size: 1.35rem;
+  font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.25;
 }
@@ -938,7 +936,11 @@ img {
     left: 42px;
     width: 75%;
     height: 2px;
-    background: var(--cyan);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--boost-tint-strong) 0 8px,
+      transparent 8px 14px
+    );
     transform-origin: left;
   }
 }
@@ -1039,18 +1041,18 @@ img {
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: linear-gradient(90deg, var(--navy), var(--blue), var(--cyan));
+  background: var(--boost);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--dur-reveal) var(--ease-out);
 }
 
 .plan-name {
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 600;
+  color: var(--boost);
+  font-weight: 700;
   transition: color var(--dur-base) var(--ease-out);
 }
 
@@ -1071,14 +1073,33 @@ img {
 
 .pricing-card ul {
   margin: 0;
-  padding-left: 1.1rem;
+  padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 10px;
   color: var(--ink-soft);
+  list-style: none;
+}
+
+.pricing-card li {
+  position: relative;
+  padding-left: 28px;
+}
+
+/* Check mark drawn with two borders */
+.pricing-card li::before {
+  content: "";
+  position: absolute;
+  top: 0.3em;
+  left: 6px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--boost);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .faq-wrap {
-  max-width: 980px;
+  max-width: 860px;
 }
 
 .faq-list {
@@ -1087,8 +1108,7 @@ img {
 }
 
 .faq-item {
-  padding: 1rem 1.1rem;
-  background: var(--paper);
+  padding: 1.1rem 1.25rem;
   transition:
     background-color var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out);
@@ -1109,15 +1129,40 @@ img {
   cursor: pointer;
   font-weight: 700;
   list-style: none;
+  transition: color var(--dur-base) var(--ease-out);
 }
 
 .faq-item summary::-webkit-details-marker {
   display: none;
 }
 
-.faq-chevron {
+/* Plus that becomes a minus: the vertical bar folds away when open */
+.faq-icon {
+  position: relative;
   flex-shrink: 0;
-  color: var(--blue);
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--boost);
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.faq-icon::before,
+.faq-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 2px;
+  margin: -1px 0 0 -5px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.faq-icon::after {
+  transform: rotate(90deg);
 }
 
 /* Answer height animates 0fr to 1fr; FaqItem toggles data-open for it. */
@@ -1144,11 +1189,19 @@ img {
 }
 
 .faq-item[open]:not([data-open="false"]) {
-  background: var(--blue-tint-strong);
+  border-color: color-mix(in srgb, var(--boost) 35%, var(--line));
 }
 
-.faq-item[open]:not([data-open="false"]) .faq-chevron {
-  transform: rotate(180deg);
+.faq-item[open]:not([data-open="false"]) summary {
+  color: var(--boost);
+}
+
+.faq-item[open]:not([data-open="false"]) .faq-icon {
+  border-color: var(--boost);
+}
+
+.faq-item[open]:not([data-open="false"]) .faq-icon::after {
+  transform: rotate(90deg) scaleX(0);
 }
 
 .audit-section {
@@ -1163,10 +1216,9 @@ img {
   gap: 28px;
   overflow: hidden;
   padding: clamp(20px, 5vw, 56px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--ink);
+  border-radius: var(--radius-xl);
+  background: var(--navy-deep);
+  color: #fff;
 }
 
 /* Twice as wide as the card and mirrored, so sliding it left 50% loops cleanly */
@@ -1196,16 +1248,24 @@ img {
 .final-cta-copy p {
   max-width: 46ch;
   margin: 0;
-  color: var(--ink-soft);
+  color: rgb(255 255 255 / 0.75);
   font-size: 1.0625rem;
 }
 
 .audit-chat {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 14px;
   padding: 20px;
-  border-radius: var(--radius-md);
-  background: var(--blue-tint);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.05);
+}
+
+/* Peeks up from the bottom of the dark panel on wide screens */
+.audit-motif {
+  display: none;
 }
 
 .audit-chat p {
@@ -1233,6 +1293,13 @@ img {
     grid-area: chat;
     align-self: start;
     max-width: 420px;
+  }
+  .audit-motif {
+    position: absolute;
+    bottom: -14px;
+    left: clamp(40px, 6vw, 96px);
+    display: block;
+    width: 190px;
   }
 }
 
@@ -1268,42 +1335,68 @@ img {
   }
 }
 
+/* Two-tone case study: story and numbers on light, proof on dark */
+.case-panel {
+  display: grid;
+  gap: 24px;
+  padding: clamp(16px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--paper);
+}
+
+.case-story {
+  display: grid;
+  align-content: center;
+  gap: 32px;
+  padding: clamp(8px, 2vw, 24px);
+}
+
+.case-proof {
+  display: grid;
+  gap: 16px;
+  padding: clamp(16px, 2.5vw, 24px);
+  border-radius: var(--radius-lg);
+  background: var(--navy-deep);
+}
+
+.case-proof-title {
+  margin: 0;
+  color: #fff;
+  font-weight: 700;
+}
+
+.case-proof .result-shots {
+  grid-template-columns: 1fr;
+}
+
+.case-proof .result-shot figcaption {
+  color: rgb(255 255 255 / 0.7);
+}
+
+.case-proof .result-shot-frame {
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+@media (min-width: 1025px) {
+  .case-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  }
+}
+
 .results-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
-  margin-bottom: 28px;
 }
 
 .result-stat {
-  position: relative;
-  overflow: hidden;
-  padding: 28px 24px 24px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--paper);
-  transition:
-    transform var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    background-color var(--dur-base) var(--ease-out);
-}
-
-/* A short accent bar at rest that runs the full width on hover */
-.result-stat::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: linear-gradient(90deg, var(--blue), var(--cyan));
-  transform: scaleX(0.18);
-  transform-origin: left;
-  transition: transform var(--dur-reveal) var(--ease-out);
+  min-width: 0;
 }
 
 .result-stat-value {
-  color: var(--navy);
-  font-size: clamp(2.5rem, 1.8rem + 2vw, 3.5rem);
+  color: var(--boost);
+  font-size: clamp(2.25rem, 1.6rem + 1.6vw, 3rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.05em;
@@ -1312,8 +1405,10 @@ img {
 }
 
 .result-stat p {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   color: var(--ink-soft);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .result-shots {
@@ -1378,13 +1473,11 @@ img {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 24px;
-  margin-top: 36px;
 }
 
 .results-quote {
-  flex: 1 1 420px;
+  flex: 1 1 100%;
   margin: 0;
   padding-left: 20px;
   border-left: 3px solid var(--blue);
@@ -1466,7 +1559,7 @@ img {
 }
 
 .site-footer {
-  background: var(--navy);
+  background: var(--navy-deep);
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1805,6 +1898,16 @@ img {
   .results-close .whatsapp-button {
     width: 100%;
   }
+  /* Phones: each stat is one row, number beside its label */
+  .result-stat {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .result-stat p {
+    margin: 0;
+  }
   .footer-columns {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1908,8 +2011,7 @@ img {
   .service-card:focus-visible,
   .pricing-card:hover,
   .pricing-card:has(:focus-visible),
-  .testimonial-box:hover,
-  .result-stat:hover {
+  .testimonial-box:hover {
     border-color: var(--blue);
     box-shadow: var(--shadow-raised);
   }
@@ -1929,14 +2031,6 @@ img {
   .service-card:hover .card-cue,
   .service-card:focus-visible .card-cue {
     color: var(--navy);
-  }
-
-  .result-stat:hover {
-    background: var(--surface);
-  }
-
-  .result-stat:hover .result-stat-value {
-    color: var(--blue);
   }
 
   .result-shot-frame:hover,
@@ -1981,13 +2075,12 @@ img {
 
   .faq-item:hover,
   .faq-item:has(summary:focus-visible) {
-    background: var(--blue-tint);
-    border-color: color-mix(in srgb, var(--blue) 40%, var(--line));
+    border-color: color-mix(in srgb, var(--boost) 40%, var(--line));
   }
 
-  .faq-item[open]:not([data-open="false"]):hover,
-  .faq-item[open]:not([data-open="false"]):has(summary:focus-visible) {
-    background: var(--blue-tint-strong);
+  .faq-item:hover .faq-icon,
+  .faq-item:has(summary:focus-visible) .faq-icon {
+    border-color: var(--boost);
   }
 
   .link-underline:hover::after,
@@ -2098,7 +2191,7 @@ img {
     transition: grid-template-rows var(--dur-accordion) var(--ease-out);
   }
 
-  .faq-chevron {
+  .faq-icon::after {
     transition: transform var(--dur-base) var(--ease-out);
   }
 
@@ -2147,12 +2240,10 @@ img {
     transform: translateY(-4px);
   }
 
-  .testimonial-box:hover,
-  .result-stat:hover {
+  .testimonial-box:hover {
     transform: translateY(-3px);
   }
 
-  .result-stat:hover::before,
   .pricing-card:hover::before,
   .pricing-card:has(:focus-visible)::before {
     transform: scaleX(1);
