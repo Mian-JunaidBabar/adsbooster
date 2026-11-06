@@ -34,6 +34,20 @@ export type ServiceItem = {
   cue?: string;
 };
 
+export type PricingPlan = {
+  name: string;
+  /** Small pill beside the plan name. */
+  tag?: string;
+  price: string;
+  /** Shown in place of the price while `price` is a placeholder. */
+  noPrice: string;
+  description: string;
+  /** Line above the feature list, e.g. "Everything in Basic, plus:". */
+  includes?: string;
+  features: string[];
+  quotePrefill: string;
+};
+
 export type FaqEntry = {
   question: string;
   answer: string;
@@ -139,11 +153,16 @@ export const content = {
       },
       { value: 71, label: "visitors from Google search in the same month" },
     ] as ProofStat[],
-    banner: {
-      src: "/results/ss-traders-banner.webp",
-      alt: "SS Traders, foundry and furnace chemicals supplier in Lahore",
-      width: 640,
-      height: 435,
+    /** Small client badge at the top of the case study; the logo is cropped to a square. */
+    client: {
+      name: "SS Traders",
+      detail: "Foundry and furnace chemicals · Lahore",
+      logo: {
+        src: "/results/ss-traders-banner.webp",
+        alt: "SS Traders logo",
+        width: 640,
+        height: 435,
+      },
     },
     screenshots: [
       {
@@ -213,25 +232,27 @@ export const content = {
   },
   process: {
     eyebrow: "How it works",
-    headline: "From first message to live ads in about a week",
+    headline: "How does working with AdsBoosters start?",
+    /** Character beside the heading. Swap the file in /public, keep the size. */
+    cartoon: { src: "/cartoon-placeholder.png", width: 240, height: 320 },
     steps: [
       {
-        step: "01",
+        step: "1",
         title: "Free audit",
         body: "We review your current ads or market and tell you what we would change.",
       },
       {
-        step: "02",
+        step: "2",
         title: "Plan and creatives",
         body: "Targeting, budget split and ad creatives, agreed with you before launch.",
       },
       {
-        step: "03",
+        step: "3",
         title: "Launch",
         body: "Campaigns go live with tracking on every form and WhatsApp chat.",
       },
       {
-        step: "04",
+        step: "4",
         title: "Optimise and report",
         body: "Weekly changes and a plain report: leads, cost per lead, what is next.",
       },
@@ -246,34 +267,42 @@ export const content = {
     headline: "One monthly fee. Ad spend stays yours.",
     subline:
       "You pay the platforms directly for ad spend, so you always see exactly where your money goes.",
-    quotePrefill:
-      "Assalam o Alaikum, mujhe ads aur social media management ka quote chahiye.",
     plans: [
       {
-        name: "Ads management",
-        // Amount in PKR, e.g. "40,000". Empty or [bracketed] shows "Custom quote";
+        name: "Basic",
+        // Amount in PKR, e.g. "40,000". Empty or [bracketed] shows `noPrice`;
         // a real amount shows "Starting from 40,000 PKR a month".
         price: "[amount]",
-        description: "+ ad spend, paid directly to the platform",
+        noPrice: "Monthly package",
+        description:
+          "A steady presence on social media and ads running every month. Ad spend is paid separately, directly to the platform.",
         features: [
-          "Google and Meta campaigns",
-          "Ad creatives and copy",
-          "Lead tracking to WhatsApp",
-          "Weekly report on WhatsApp",
+          "15 posts a month",
+          "2 videos a month",
+          "Ads management",
+          "Social media management",
         ],
+        quotePrefill:
+          "Assalam o Alaikum, mujhe Basic plan ka price chahiye (15 posts, 2 videos, ads aur social media management).",
       },
       {
-        name: "Social media management",
+        name: "Custom",
+        tag: "Built around you",
         price: "[amount]",
-        description: "Ad spend not included",
+        noPrice: "Custom quote",
+        description:
+          "For businesses that want more than social media. We size the plan to your goals, your market and your budget.",
+        includes: "Everything in Basic, plus:",
         features: [
-          "Monthly content calendar",
-          "Posts and stories designed",
-          "Inbox and comment replies",
-          "Monthly performance summary",
+          "SEO and Google Maps ranking",
+          "Google Ads",
+          "Website development and maintenance",
+          "More posts and videos if you need them",
         ],
+        quotePrefill:
+          "Assalam o Alaikum, mujhe Custom plan chahiye. Meri requirements ye hain:",
       },
-    ],
+    ] as PricingPlan[],
   },
   faqs: {
     eyebrow: "FAQ",
@@ -314,6 +343,22 @@ export const content = {
         link: { href: "#results", label: "SS Traders above" },
       },
     ] as FaqEntry[],
+  },
+  /** Website-only audit request. Sends the site on WhatsApp, so it needs no backend field. */
+  auditBanner: {
+    eyebrow: "Free website check",
+    headline: "Send your website. Get a free audit.",
+    checks: [
+      "Free for new businesses and ones already running ads",
+      "Reply on WhatsApp within 15 minutes, 10am–8pm",
+      "If ads aren't a fit for you, we'll say so",
+    ],
+    label: "Your website",
+    placeholder: "yourwebsite.com",
+    button: "Get my free audit",
+    note: "Opens WhatsApp with your website filled in.",
+    whatsappPrefill:
+      "Assalam o Alaikum, mujhe apni website ka free audit chahiye:",
   },
   audit: {
     headline: "Tell us what you sell. We'll show you where the leads are.",

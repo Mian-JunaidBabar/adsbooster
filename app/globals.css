@@ -750,12 +750,12 @@ img {
   line-height: 1.4;
 }
 
-/* "Sound familiar?" heading with its drawing on wide screens */
-.pains-head {
+/* Section heading with a drawing beside it on wide screens */
+.art-head {
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
-  gap: 32px;
+  gap: 16px 32px;
 }
 
 .pains-motif {
@@ -764,7 +764,7 @@ img {
 }
 
 @media (min-width: 1025px) {
-  .pains-head {
+  .art-head {
     grid-template-columns: auto 1fr;
   }
   .pains-motif {
@@ -877,24 +877,32 @@ img {
 }
 
 /* Process: numbered badges joined by a line */
+/* Process: floating cards, the step number overlapping each card's top */
 .process-timeline {
-  position: relative;
   display: grid;
-  gap: 8px;
+  gap: 40px 24px;
   margin: 0;
-  padding: 0;
+  padding: 22px 0 0;
   list-style: none;
 }
 
 .process-step {
   position: relative;
-  z-index: 1;
-  padding: 20px 20px 22px;
-  border-radius: var(--radius-md);
-  transition: background-color var(--dur-base) var(--ease-out);
+  padding: 38px 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--dur-spring) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
 }
 
 .step-badge {
+  position: absolute;
+  top: -22px;
+  left: 24px;
   display: grid;
   place-items: center;
   width: 44px;
@@ -902,16 +910,17 @@ img {
   border-radius: 50%;
   background: var(--boost);
   color: white;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 5px var(--surface), var(--shadow-cta);
   transition:
     background-color var(--dur-base) var(--ease-out),
     box-shadow var(--dur-base) var(--ease-out);
 }
 
 .process-step h3 {
-  margin: 18px 0 10px;
+  margin: 0 0 8px;
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.25;
@@ -920,28 +929,188 @@ img {
 .process-step p {
   margin: 0;
   color: var(--ink-soft);
+  font-size: 0.9375rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
+  .process-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
   .process-timeline {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
+  }
+}
+
+/* Character beside the process heading; above it on narrow screens */
+.process-cartoon {
+  width: 96px;
+  height: auto;
+}
+
+@media (min-width: 1025px) {
+  .process-cartoon {
+    width: 132px;
   }
 
-  /* Runs from the centre of the first badge to the centre of the last */
-  .process-timeline::before {
-    content: "";
-    position: absolute;
-    top: 42px;
-    left: 42px;
-    width: 75%;
-    height: 2px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--boost-tint-strong) 0 8px,
-      transparent 8px 14px
-    );
-    transform-origin: left;
+  .art-head + .process-timeline {
+    margin-top: 20px;
+  }
+}
+
+/* Free audit banner: dark floating panel, one-field form on the right */
+.audit-banner-section {
+  padding-bottom: clamp(64px, 7vw, 96px);
+  background: var(--surface);
+}
+
+.audit-banner {
+  display: grid;
+  gap: 28px;
+  align-items: center;
+  padding: clamp(24px, 5vw, 56px);
+  border-radius: var(--radius-xl);
+  background: var(--navy-deep);
+  box-shadow: 0 24px 48px -24px rgb(10 26 48 / 0.45);
+  color: #fff;
+}
+
+.audit-banner-copy {
+  display: grid;
+  gap: 16px;
+}
+
+.audit-banner .eyebrow {
+  color: var(--sky);
+}
+
+.audit-banner .eyebrow::before {
+  background: var(--sky);
+}
+
+.audit-banner h2 {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.audit-banner-checks {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.audit-banner-checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgb(255 255 255 / 0.82);
+  font-size: 0.9375rem;
+}
+
+.audit-banner-checks svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--sky);
+}
+
+/* Input and button share one white pill; the pill carries the focus ring */
+.audit-banner-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.audit-banner-field:focus-within {
+  border-color: var(--boost);
+  box-shadow: 0 0 0 4px rgb(31 95 255 / 0.35);
+}
+
+.audit-banner-field:has([aria-invalid="true"]) {
+  border-color: var(--danger);
+}
+
+.audit-banner-field input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 8px 0 18px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.audit-banner-field input::placeholder {
+  color: var(--muted);
+}
+
+.audit-banner-field input:focus-visible {
+  outline: none;
+}
+
+.audit-banner-field .primary-button {
+  flex: none;
+  width: auto;
+  min-height: 48px;
+  padding: 0 1.4rem;
+  box-shadow: var(--shadow-cta);
+}
+
+.audit-banner-field .primary-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.audit-banner-help {
+  min-height: 1.5em;
+  margin: 10px 0 0 18px;
+  color: rgb(255 255 255 / 0.65);
+  font-size: 0.8125rem;
+}
+
+.audit-banner-error {
+  color: #ffb4ad;
+  font-weight: 600;
+}
+
+@media (min-width: 1025px) {
+  .audit-banner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+    gap: 56px;
+  }
+}
+
+/* Phones: the button drops under the input, both full width */
+@media (max-width: 479px) {
+  .audit-banner-field {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: var(--radius-lg);
+  }
+  .audit-banner-field input {
+    padding: 0 12px;
+  }
+  .audit-banner-field .primary-button {
+    width: 100%;
+  }
+  .audit-banner-help {
+    margin-left: 4px;
   }
 }
 
@@ -1029,10 +1198,16 @@ img {
 .pricing-card {
   position: relative;
   overflow: hidden;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 18px;
   background: var(--surface);
-  padding: 24px;
+  padding: 28px;
+}
+
+/* Buttons line up at the bottom whatever the list length */
+.pricing-card > a:last-child {
+  margin-top: auto;
 }
 
 /* Accent bar that draws across the top on hover */
@@ -1048,18 +1223,49 @@ img {
 }
 
 .plan-name {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--boost);
-  font-weight: 700;
+  font-size: 1.375rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-weight: 800;
   transition: color var(--dur-base) var(--ease-out);
 }
 
+.plan-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-tag {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--boost-tint);
+  color: var(--boost-hover);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* The tailored plan carries a boost border so the two read as a choice */
+.pricing-card[data-featured] {
+  border: 2px solid var(--boost);
+  box-shadow: var(--shadow-md);
+}
+
+.pricing-card .plan-includes {
+  margin: 0 0 -6px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
 .plan-price {
-  font-size: clamp(2rem, 1.5rem + 1vw, 2.8rem);
+  margin-top: -8px;
+  color: var(--boost);
+  font-size: clamp(1.625rem, 1.3rem + 1vw, 2.125rem);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .plan-price small {
@@ -1315,24 +1521,37 @@ img {
   margin-bottom: 0;
 }
 
-.results-banner {
-  overflow: hidden;
-  border: 1px solid var(--line);
+.results-intro .section-heading-block h2 {
+  max-width: 28ch;
+}
+
+/* Client badge: the logo cropped to a small square beside the name */
+.client-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.client-badge img {
+  flex: none;
+  width: 64px;
+  height: 64px;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-raised);
+  object-fit: cover;
+  object-position: 50% 40%;
+  box-shadow: var(--shadow-md);
 }
 
-.results-banner img {
-  width: 100%;
-  height: auto;
-  transition: transform var(--dur-reveal) var(--ease-out);
+.client-badge strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.3;
 }
 
-@media (min-width: 1025px) {
-  .results-intro {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: 56px;
-  }
+.client-badge span {
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 /* Two-tone case study: story and numbers on light, proof on dark */
@@ -2064,13 +2283,12 @@ img {
   }
 
   .process-step:hover {
-    background: var(--blue-tint);
+    border-color: color-mix(in srgb, var(--boost) 40%, var(--line));
   }
 
   /* The step badge brightens and picks up a soft halo */
   .process-step:hover .step-badge {
-    background: var(--blue);
-    box-shadow: 0 0 0 6px var(--blue-tint-strong);
+    background: var(--boost-hover);
   }
 
   .faq-item:hover,
@@ -2195,16 +2413,7 @@ img {
     animation-delay: var(--reveal-delay, 0ms);
   }
 
-  /* Process: the line draws once, then the badges pop in one after another */
-  .reveal-ready .process-timeline::before {
-    transform: scaleX(0);
-  }
-
-  .reveal-ready .process-timeline:has(.is-revealed)::before {
-    transform: scaleX(1);
-    transition: transform 800ms var(--ease-out);
-  }
-
+  /* Process: each card rises in, then its number pops in */
   .reveal-ready .process-step:not(.is-revealed) .step-badge {
     opacity: 0;
     transform: scale(0.9);
@@ -2288,7 +2497,8 @@ img {
     transform: scaleX(1);
   }
 
-  .testimonial-box:hover {
+  .testimonial-box:hover,
+  .process-step:hover {
     transform: translateY(-3px);
   }
 
@@ -2298,8 +2508,7 @@ img {
   }
 
   .result-shot-frame:hover img,
-  .result-shot-frame:focus-visible img,
-  .results-banner:hover img {
+  .result-shot-frame:focus-visible img {
     transform: scale(1.02);
   }
 

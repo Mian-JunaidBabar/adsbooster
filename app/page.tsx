@@ -15,6 +15,7 @@ import {
 import type { CSSProperties } from "react";
 import CountUp from "../components/CountUp";
 import FaqItem from "../components/FaqItem";
+import FreeAuditBanner from "../components/FreeAuditBanner";
 import HeroCards from "../components/HeroCards";
 import LeadForm from "../components/LeadForm";
 import { MegaphoneMotif, ThinkingMotif } from "../components/motifs";
@@ -89,7 +90,6 @@ function WhatsAppIcon() {
 export default function Home() {
   const stats = getCompleteStats(content.stats);
   const testimonials = getCompleteTestimonials(content.testimonials);
-  const quoteHref = whatsappLink(content.pricing.quotePrefill);
   const { results } = content;
   const resultsHref = whatsappLink(results.whatsappPrefill);
   const hasQuote =
@@ -158,9 +158,7 @@ export default function Home() {
               <span className="accent">{headlineAccent}</span>
             </h1>
 
-            <p className="hero-subline">
-              {content.hero.subline}
-            </p>
+            <p className="hero-subline">{content.hero.subline}</p>
 
             <ul className="hero-checklist">
               {content.hero.checklist.map((item, i) => (
@@ -215,7 +213,7 @@ export default function Home() {
 
       <section className="page-section paper-section">
         <div className="container">
-          <div className="pains-head">
+          <div className="art-head">
             <ThinkingMotif className="pains-motif" />
             <div className="section-heading-block" {...reveal()}>
               <div className="eyebrow">{content.pains.eyebrow}</div>
@@ -245,19 +243,24 @@ export default function Home() {
                 )}
               </p>
             </div>
-            <div className="results-banner" {...reveal(1)}>
-              <Image
-                src={results.banner.src}
-                alt={results.banner.alt}
-                width={results.banner.width}
-                height={results.banner.height}
-                sizes="(max-width: 1024px) 100vw, 480px"
-              />
-            </div>
           </div>
 
           <div className="case-panel">
             <div className="case-story">
+              <div className="client-badge">
+                <Image
+                  src={results.client.logo.src}
+                  alt={results.client.logo.alt}
+                  width={results.client.logo.width}
+                  height={results.client.logo.height}
+                  sizes="64px"
+                />
+                <div>
+                  <strong>{results.client.name}</strong>
+                  <span>{results.client.detail}</span>
+                </div>
+              </div>
+
               <div className="results-stats">
                 {results.stats.map(({ value, prefix, suffix, label }, i) => (
                   <div
@@ -324,9 +327,19 @@ export default function Home() {
 
       <section id="process" className="page-section surface-section">
         <div className="container">
-          <div className="section-heading-block" {...reveal()}>
-            <div className="eyebrow">{content.process.eyebrow}</div>
-            <h2>{content.process.headline}</h2>
+          <div className="art-head">
+            <Image
+              className="process-cartoon"
+              src={content.process.cartoon.src}
+              alt=""
+              width={content.process.cartoon.width}
+              height={content.process.cartoon.height}
+              sizes="132px"
+            />
+            <div className="section-heading-block" {...reveal()}>
+              <div className="eyebrow">{content.process.eyebrow}</div>
+              <h2>{content.process.headline}</h2>
+            </div>
           </div>
 
           <ol className="process-timeline">
@@ -340,6 +353,14 @@ export default function Home() {
           </ol>
         </div>
       </section>
+
+      {hasWhatsApp ? (
+        <section className="audit-banner-section">
+          <div className="container">
+            <FreeAuditBanner {...content.auditBanner} />
+          </div>
+        </section>
+      ) : null}
 
       {stats.length > 0 ? (
         <section className="stats-band" data-count-scope>
@@ -396,12 +417,32 @@ export default function Home() {
 
           <div className="pricing-grid">
             {content.pricing.plans.map(
-              ({ name, price, description, features }, i) => {
+              (
+                {
+                  name,
+                  tag,
+                  price,
+                  noPrice,
+                  description,
+                  includes,
+                  features,
+                  quotePrefill,
+                },
+                i,
+              ) => {
                 const hasPrice = !isPlaceholder(price);
-                const asksOnWhatsApp = !hasPrice && quoteHref;
+                const quoteHref = whatsappLink(quotePrefill);
                 return (
-                  <article key={name} className="pricing-card" {...reveal(i)}>
-                    <div className="plan-name">{name}</div>
+                  <article
+                    key={name}
+                    className="pricing-card"
+                    data-featured={tag ? "" : undefined}
+                    {...reveal(i)}
+                  >
+                    <div className="plan-head">
+                      <div className="plan-name">{name}</div>
+                      {tag ? <span className="plan-tag">{tag}</span> : null}
+                    </div>
                     <div className="plan-price">
                       {hasPrice ? (
                         <>
@@ -410,16 +451,19 @@ export default function Home() {
                           <small>a month</small>
                         </>
                       ) : (
-                        "Custom quote"
+                        noPrice
                       )}
                     </div>
                     <p>{description}</p>
+                    {includes ? (
+                      <p className="plan-includes">{includes}</p>
+                    ) : null}
                     <ul>
                       {features.map((feature) => (
                         <li key={feature}>{feature}</li>
                       ))}
                     </ul>
-                    {asksOnWhatsApp ? (
+                    {quoteHref ? (
                       <a
                         className="whatsapp-button"
                         href={quoteHref}
