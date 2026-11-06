@@ -1,7 +1,7 @@
 "use client";
 
-import { MessageSquareText } from "lucide-react";
 import { useEffect, useState } from "react";
+import WhatsAppLogo from "./WhatsAppLogo";
 
 /** Mobile bar that slides up once the hero has scrolled out of view. */
 export default function StickyWhatsApp({ href }: { href: string }) {
@@ -26,7 +26,7 @@ export default function StickyWhatsApp({ href }: { href: string }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <MessageSquareText size={18} aria-hidden="true" />
+        <WhatsAppLogo size={20} />
         Chat on WhatsApp
       </a>
     </div>

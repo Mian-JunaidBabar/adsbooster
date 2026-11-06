@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowRight, Check, MessageSquareText } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { budgetOptions, businessTypes } from "../lib/form-options";
 import { trackLead } from "../lib/track";
+import WhatsAppLogo from "./WhatsAppLogo";
 
 type LeadFormState = {
   name: string;
@@ -200,7 +201,7 @@ export default function LeadForm({ whatsappHref }: { whatsappHref: string }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <MessageSquareText size={18} aria-hidden="true" />
+            <WhatsAppLogo size={20} />
             Chat on WhatsApp
           </a>
         ) : null}

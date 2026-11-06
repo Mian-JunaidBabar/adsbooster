@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Mail,
   MapPin,
-  MessageSquareText,
   Phone,
   ShieldCheck,
   TrendingUp,
@@ -15,6 +14,7 @@ import {
 import type { CSSProperties } from "react";
 import CountUp from "../components/CountUp";
 import FaqItem from "../components/FaqItem";
+import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import FreeAuditBanner from "../components/FreeAuditBanner";
 import HeroCards from "../components/HeroCards";
 import LeadForm from "../components/LeadForm";
@@ -23,6 +23,7 @@ import MotionController from "../components/MotionController";
 import NavPills from "../components/NavPills";
 import ResultShots from "../components/ResultShots";
 import StickyWhatsApp from "../components/StickyWhatsApp";
+import WhatsAppLogo from "../components/WhatsAppLogo";
 import WhatsAppTracking from "../components/WhatsAppTracking";
 import {
   content,
@@ -83,10 +84,6 @@ function ServiceCard({
   );
 }
 
-function WhatsAppIcon() {
-  return <MessageSquareText size={18} aria-hidden="true" />;
-}
-
 export default function Home() {
   const stats = getCompleteStats(content.stats);
   const testimonials = getCompleteTestimonials(content.testimonials);
@@ -126,22 +123,25 @@ export default function Home() {
           <NavPills items={content.nav} />
 
           <div className="header-actions">
-            <a className="header-phone" href={content.footer.phone.href}>
-              <Phone size={16} aria-hidden="true" />
-              {content.footer.phone.label}
-            </a>
             {hasWhatsApp ? (
               <a
                 className="whatsapp-button header-whatsapp"
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Chat on WhatsApp"
+                aria-label={`Chat on WhatsApp: ${content.footer.phone.label}`}
               >
-                <WhatsAppIcon />
-                <span className="header-whatsapp-label">WhatsApp</span>
+                <WhatsAppLogo size={22} />
+                <span className="header-whatsapp-label">
+                  {content.footer.phone.label}
+                </span>
               </a>
-            ) : null}
+            ) : (
+              <a className="header-phone" href={content.footer.phone.href}>
+                <Phone size={16} aria-hidden="true" />
+                {content.footer.phone.label}
+              </a>
+            )}
           </div>
         </div>
       </header>
@@ -177,7 +177,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <WhatsAppIcon />
+                  <WhatsAppLogo size={20} />
                   Chat on WhatsApp
                 </a>
               ) : null}
@@ -294,7 +294,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <WhatsAppIcon />
+                    <WhatsAppLogo size={20} />
                     {results.ctaLabel}
                   </a>
                 ) : null}
@@ -470,7 +470,7 @@ export default function Home() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <WhatsAppIcon />
+                        <WhatsAppLogo size={20} />
                         Get a quote on WhatsApp
                       </a>
                     ) : (
@@ -526,7 +526,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <WhatsAppIcon />
+                  <WhatsAppLogo size={20} />
                   Chat on WhatsApp
                 </a>
               </div>
@@ -568,29 +568,29 @@ export default function Home() {
               <h3>
                 <Mail size={15} aria-hidden="true" /> Contact
               </h3>
-              <a
-                href={content.footer.phone.href}
-                className="link-underline"
-              >
-                <Phone size={15} aria-hidden="true" />
-                {content.footer.phone.label}
-              </a>
-              <a
-                href={`mailto:${content.footer.email}`}
-                className="link-underline"
-              >
-                Email us
-              </a>
               {hasWhatsApp ? (
                 <a
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-underline"
+                  aria-label={`Chat on WhatsApp: ${content.footer.phone.label}`}
                 >
-                  Chat on WhatsApp
+                  <WhatsAppLogo size={16} />
+                  {content.footer.phone.label}
                 </a>
-              ) : null}
+              ) : (
+                <a href={content.footer.phone.href} className="link-underline">
+                  <Phone size={15} aria-hidden="true" />
+                  {content.footer.phone.label}
+                </a>
+              )}
+              <a
+                href={`mailto:${content.footer.email}`}
+                className="link-underline"
+              >
+                Email us
+              </a>
               <span>
                 <MapPin size={15} aria-hidden="true" />
                 {isPlaceholder(address)
@@ -649,6 +649,7 @@ export default function Home() {
       </footer>
 
       {hasWhatsApp ? <StickyWhatsApp href={whatsappHref} /> : null}
+      {hasWhatsApp ? <FloatingWhatsApp href={whatsappHref} /> : null}
     </main>
   );
 }

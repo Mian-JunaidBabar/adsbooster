@@ -21,7 +21,9 @@ export default function WhatsAppTracking() {
           ? "header"
           : link.closest(".mobile-sticky-cta")
             ? "sticky-bar"
-            : "other");
+            : link.closest(".floating-whatsapp")
+              ? "floating-button"
+              : "other");
       trackLead("whatsapp", placement);
     };
     document.addEventListener("click", onClick, { capture: true });
