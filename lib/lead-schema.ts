@@ -15,7 +15,10 @@ export const leadSchema = z
           : value,
       z.string().email("Enter a valid email address").max(160).optional(),
     ),
-    businessType: z.enum(businessTypes),
+    businessType: z.union([
+      z.enum(businessTypes),
+      z.literal("Clinic / Healthcare"),
+    ]),
     city: z.string().trim().min(2, "City is required").max(60),
     phone: z
       .string()
