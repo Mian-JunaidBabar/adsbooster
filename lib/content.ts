@@ -188,7 +188,7 @@ export const content = {
     proofTitle: "Screenshots from SS Traders' own Meta and Google accounts",
     ctaLabel: "Get results like this",
     whatsappPrefill:
-      "Assalam o Alaikum, I saw the SS Traders results and want the same for my business.",
+      "Assalam o Alaikum, I saw the AdsBooster results and want the same for my business.",
   },
   services: {
     eyebrow: "What we run",
